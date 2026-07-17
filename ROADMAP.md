@@ -56,7 +56,7 @@ declares" with grounded, version-correct citations — without the operator hand
 |------|-------|----------------------|--------|
 | 0 | Fork foundations & sync hygiene | repo meta, `ANDROID.md` | ✅ (benchmark → Phase 5) |
 | 1 | Source-code intelligence (Kotlin/Java/Dart) | `src/splitter/treesitter/` | ✅ java + kotlin (dart: line-based, AST follow-up) |
-| 2 | Ecosystem package registries | `src/scraper/strategies/` | 🟡 pub.dev + javadoc.io + gradle-plugins done |
+| 2 | Ecosystem package registries | `src/scraper/strategies/` | ✅ 5 host strategies + docUrl mapping |
 | 3 | API-doc pipelines (Javadoc/KDoc/Dartdoc) | `src/scraper/middleware/`, `pipelines/` | ⬜ |
 | 4 | Project-aware version resolution | `src/manifest/`, `src/tools/` | 🟡 parsers + resolve/scrape-project + search wiring |
 | 5 | Search quality tuning for Android | `tests/search-eval/`, retriever | ⬜ |
@@ -186,15 +186,18 @@ register them in `src/scraper/ScraperRegistry.ts` behind new URL schemes/handler
 - ✅ **pub.dev strategy** — `PubDevScraperStrategy` recognizes `pub.dev` package pages
   (Dart/Flutter). Registered and tested. Especially valuable since Dart source has no
   AST parser yet (Phase 1).
-- ⬜ **Google Maven strategy** — `dl.google.com/.../maven2` (AndroidX/AGP). Deferred:
-  these artifacts have no canonical hosted doc page, so coordinate→docs URL mapping is
-  an open design question (see below). AndroidX docs largely live on developer.android.com.
+- ✅ **Android official docs strategies** — Google Maven artifacts (AndroidX/AGP) have
+  no per-artifact hosted doc page, so instead of mapping coordinates to a binary repo,
+  this fork recognizes the official documentation hosts:
+  `AndroidDevDocsScraperStrategy` (`developer.android.com` — Android SDK + AndroidX
+  reference/guides) and `KotlinLangScraperStrategy` (`kotlinlang.org`). Registered and
+  tested. General Maven coordinates still map to javadoc.io via `documentationUrl`.
 - ✅ **Gradle Plugin Portal strategy** — `GradlePluginScraperStrategy` recognizes
   `plugins.gradle.org` (plugin pages keyed by id, e.g. `/plugin/com.android.application`).
   Registered and tested.
-- ⬜ Introduce a coordinate-parsing utility so `ScrapeTool`/`FindVersionTool`
-  accept ecosystem-native identifiers (`androidx.compose.ui:ui:1.x`,
-  `dart:pubspec` names, `com.android.application` plugin ids). Ties into Phase 4.
+- ✅ Coordinate handling — covered by Phase 4: `documentationUrl` maps ecosystem-native
+  coordinates to registry URLs, and `resolve-project-deps` / `scrape-project` consume
+  them end-to-end (`androidx.compose.ui:ui`, pub package names, plugin ids).
 
 **Risks:** each registry has bespoke metadata/redirect behavior; Google Maven has
 no human doc index per artifact — may need to map coordinates → docs site.

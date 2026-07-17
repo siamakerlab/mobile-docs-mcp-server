@@ -2,9 +2,11 @@ import type { AppConfig } from "../utils/config";
 import { ScraperError } from "../utils/errors";
 import { logger } from "../utils/logger";
 import { validateUrl } from "../utils/url";
+import { AndroidDevDocsScraperStrategy } from "./strategies/AndroidDevDocsScraperStrategy";
 import { GitHubScraperStrategy } from "./strategies/GitHubScraperStrategy";
 import { GradlePluginScraperStrategy } from "./strategies/GradlePluginScraperStrategy";
 import { JavadocScraperStrategy } from "./strategies/JavadocScraperStrategy";
+import { KotlinLangScraperStrategy } from "./strategies/KotlinLangScraperStrategy";
 import { LocalFileStrategy } from "./strategies/LocalFileStrategy";
 import { NpmScraperStrategy } from "./strategies/NpmScraperStrategy";
 import { PubDevScraperStrategy } from "./strategies/PubDevScraperStrategy";
@@ -66,6 +68,16 @@ export class ScraperRegistry {
       return new GradlePluginScraperStrategy(this.config);
     }
 
+    if (isAndroidDevDocsUrl(url)) {
+      logger.debug(`Using strategy "AndroidDevDocsScraperStrategy" for URL: ${url}`);
+      return new AndroidDevDocsScraperStrategy(this.config);
+    }
+
+    if (isKotlinLangUrl(url)) {
+      logger.debug(`Using strategy "KotlinLangScraperStrategy" for URL: ${url}`);
+      return new KotlinLangScraperStrategy(this.config);
+    }
+
     if (isGitHubUrl(url)) {
       logger.debug(`Using strategy "GitHubScraperStrategy" for URL: ${url}`);
       return new GitHubScraperStrategy(this.config);
@@ -124,6 +136,24 @@ function isGradlePluginUrl(url: string): boolean {
   try {
     const { hostname } = new URL(url);
     return ["plugins.gradle.org", "www.plugins.gradle.org"].includes(hostname);
+  } catch {
+    return false;
+  }
+}
+
+function isAndroidDevDocsUrl(url: string): boolean {
+  try {
+    const { hostname } = new URL(url);
+    return hostname === "developer.android.com";
+  } catch {
+    return false;
+  }
+}
+
+function isKotlinLangUrl(url: string): boolean {
+  try {
+    const { hostname } = new URL(url);
+    return ["kotlinlang.org", "www.kotlinlang.org"].includes(hostname);
   } catch {
     return false;
   }

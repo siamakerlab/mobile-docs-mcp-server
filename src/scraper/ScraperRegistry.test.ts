@@ -2,9 +2,11 @@ import { describe, expect, it } from "vitest";
 import { loadConfig } from "../utils/config";
 import { ScraperError } from "../utils/errors";
 import { ScraperRegistry } from "./ScraperRegistry";
+import { AndroidDevDocsScraperStrategy } from "./strategies/AndroidDevDocsScraperStrategy";
 import { GitHubScraperStrategy } from "./strategies/GitHubScraperStrategy";
 import { GradlePluginScraperStrategy } from "./strategies/GradlePluginScraperStrategy";
 import { JavadocScraperStrategy } from "./strategies/JavadocScraperStrategy";
+import { KotlinLangScraperStrategy } from "./strategies/KotlinLangScraperStrategy";
 import { LocalFileStrategy } from "./strategies/LocalFileStrategy";
 import { NpmScraperStrategy } from "./strategies/NpmScraperStrategy";
 import { PubDevScraperStrategy } from "./strategies/PubDevScraperStrategy";
@@ -66,6 +68,22 @@ describe("ScraperRegistry", () => {
       "https://plugins.gradle.org/plugin/com.android.application",
     );
     expect(strategy).toBeInstanceOf(GradlePluginScraperStrategy);
+  });
+
+  it("should return AndroidDevDocsScraperStrategy for developer.android.com URLs", () => {
+    const registry = new ScraperRegistry(appConfig);
+    const strategy = registry.getStrategy(
+      "https://developer.android.com/reference/androidx/core/app/ActivityCompat",
+    );
+    expect(strategy).toBeInstanceOf(AndroidDevDocsScraperStrategy);
+  });
+
+  it("should return KotlinLangScraperStrategy for kotlinlang.org URLs", () => {
+    const registry = new ScraperRegistry(appConfig);
+    const strategy = registry.getStrategy(
+      "https://kotlinlang.org/docs/coroutines-guide.html",
+    );
+    expect(strategy).toBeInstanceOf(KotlinLangScraperStrategy);
   });
 
   it("should return WebScraperStrategy for generic HTTP URLs", () => {
