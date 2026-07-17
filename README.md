@@ -21,6 +21,32 @@ This fork adapts Grounded Docs into a documentation companion purpose-built for 
 
 See the **[ROADMAP](ROADMAP.md)** for the detailed, phased plan to get there.
 
+### Android workflow (fork-specific)
+
+These commands use features added by this fork, so they assume a local build
+(`npm run build`) or a global install of this fork — the `resolve-project-deps`
+command and AST chunking for Kotlin/Java are not in upstream.
+
+```bash
+# 1. See exactly what your project depends on — each result carries a docUrl
+#    (javadoc.io / pub.dev / plugins.gradle.org) at the declared version.
+docs-mcp-server resolve-project-deps ./my-android-app --output json
+
+# 2. Index a dependency's docs at that version (paste a docUrl from step 1).
+docs-mcp-server scrape okhttp https://javadoc.io/doc/com.squareup.okhttp3/okhttp/4.12.0
+
+# 3. Index your own Kotlin/Java source with AST-aware, symbol-aligned chunking.
+docs-mcp-server scrape my-app file:///abs/path/to/my-android-app/app/src
+
+# 4. Search across everything you indexed.
+docs-mcp-server search okhttp "connection pool timeout"
+```
+
+Over MCP, the `resolve_project_deps` tool returns each dependency's `docUrl`, so an
+assistant can resolve → scrape → search version-correct documentation in one flow.
+Recognized manifests: Gradle version catalogs (`libs.versions.toml`), `build.gradle(.kts)`,
+and Flutter `pubspec.yaml`.
+
 ## ✨ Why Grounded Docs MCP Server?
 
 The open-source alternative to **Context7**, **Nia**, and **Ref.Tools**.
