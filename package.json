@@ -1,7 +1,7 @@
 {
-  "name": "@arabold/docs-mcp-server",
-  "version": "2.4.2",
-  "description": "MCP server for fetching and searching documentation",
+  "name": "@siamakerlab/android-docs-mcp-server",
+  "version": "2.4.2-android.1",
+  "description": "Android/Kotlin/Flutter-focused fork of the docs MCP server: index and search version-correct library documentation",
   "type": "module",
   "bin": {
     "docs-mcp-server": "dist/index.js"
@@ -10,7 +10,7 @@
   "author": "grounded.tools",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/arabold/docs-mcp-server.git"
+    "url": "git+https://github.com/siamakerlab/android-docs-mcp-server.git"
   },
   "files": [
     "dist",
@@ -22,6 +22,7 @@
   ],
   "scripts": {
     "prepare": "husky || true",
+    "prepublishOnly": "npm run build",
     "build": "vite build --config vite.config.web.ts && vite build",
     "start": "node --enable-source-maps dist/index.js",
     "cli": "node --enable-source-maps dist/index.js",
