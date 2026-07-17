@@ -61,7 +61,7 @@ declares" with grounded, version-correct citations — without the operator hand
 | 4 | Project-aware version resolution | `src/manifest/`, `src/tools/` | ✅ parsers + resolve/scrape-project + search wiring |
 | 5 | Search quality tuning for Android | `tests/search-eval/` | 🟡 android qrel dataset (draft) |
 | 6 | Agent Skills & developer experience | `skills/`, docs | 🟡 android-project-docs skill + recipes |
-| 7 | Distribution & pre-seeded indexes | Docker, release pipeline | ⬜ |
+| 7 | Distribution & pre-seeded indexes | Docker, release pipeline | 🟡 docker grammar verification |
 
 The **critical path** is Phase 1 → Phase 4: without Kotlin/Java/Dart chunking
 (1) and manifest-driven version detection (4), the Android value proposition is
@@ -345,9 +345,11 @@ exact Compose version" by following documented skills/recipes.
 **Goal:** ship the fork so Android teams can adopt it in minutes.
 
 **Tasks**
-- ⬜ Docker image that **builds all native grammars** (Phase 1) and Playwright deps
-  cleanly on Node 22; extend `test/docker-e2e.test.ts` to assert Kotlin/Java/Dart
-  parsing inside the image.
+- ✅ Docker image builds the native grammars + Playwright deps on Node 22
+  (`node:22-trixie-slim`); `docker-e2e` asserts Kotlin + Java grammars load and parse
+  inside the production image ("ships working Kotlin and Java tree-sitter grammars").
+  Dart has no grammar (line-based fallback). This also serves as the **Node 22
+  re-validation** deferred from Phase 1.
 - ⬜ Optional **pre-seeded index** artifacts for stable core docs
   (Android SDK, Kotlin stdlib) so first-run search is useful without a long scrape.
 - ⬜ Release automation aligned with the Phase 0 versioning decision; changelog

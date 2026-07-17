@@ -113,6 +113,22 @@ describe.skipIf(!DOCKER_AVAILABLE)("Docker image", () => {
     expect(r.stdout).toContain("OK");
   });
 
+  it("ships working Kotlin and Java tree-sitter grammars", () => {
+    // The Android/JVM AST chunking depends on these native grammars building and
+    // loading inside the production image (Node 22, N-API prebuilds).
+    const script =
+      "const P=require('tree-sitter');" +
+      "const J=require('tree-sitter-java');" +
+      "const K=require('tree-sitter-kotlin');" +
+      "const p=new P();" +
+      "p.setLanguage(J);const j=p.parse('class A{}').rootNode.type;" +
+      "p.setLanguage(K);const k=p.parse('fun f(){}').rootNode.type;" +
+      "console.log(j==='program'&&k==='source_file'?'GRAMMARS_OK':'FAIL:'+j+','+k);";
+    const r = docker(["run", "--rm", "--entrypoint", "node", IMAGE_TAG, "-e", script]);
+    expect(r.status, r.stderr).toBe(0);
+    expect(r.stdout).toContain("GRAMMARS_OK");
+  });
+
   it("scrapes a live web page through the Playwright pipeline", () => {
     const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), "docs-mcp-docker-web-"));
     // Make sure the host-side dir is writable by uid 1000 (the container user).

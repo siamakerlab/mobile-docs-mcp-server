@@ -92,6 +92,8 @@ a follow-up sub-task rather than a Phase 1 blocker.
       fallback — done: `TreesitterSourceCodeSplitter` logs a `logger.debug` note and
       falls back, proven content-preserving and regression-tested. A dedicated Dart
       grammar (options above) remains a follow-up, not a Phase 1 blocker.
-- [ ] Re-run the grammar load test on **Node 22** and record the result here
-      (validated on Node 24 so far; N-API makes this low-risk).
+- [x] Re-run the grammar load test on **Node 22** — confirmed via `docker-e2e`: the
+      production `node:22-trixie-slim` image builds the grammars and asserts Kotlin +
+      Java load and parse inside it ("ships working Kotlin and Java tree-sitter
+      grammars"). N-API prebuilds carried across Node 22/24 as expected.
 - [ ] Add the chosen grammars to the Phase 7 Docker build check.
