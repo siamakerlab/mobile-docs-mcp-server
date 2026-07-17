@@ -110,25 +110,29 @@ For agents and scripts, the CLI is usually the simplest way to use Grounded Docs
 **1. Index documentation** (requires Node.js 22+):
 
 ```bash
-npx @arabold/docs-mcp-server@latest scrape react https://react.dev/reference/react
+npx @siamakerlab/android-docs-mcp-server@latest scrape kotlin https://kotlinlang.org/docs/
 ```
+
+> Tip: for `scope=subpages` (the default), prefer a directory URL ending in `/`
+> (e.g. `.../docs/`). A file-like root such as `.../home.html` is scoped to that
+> single page — use a directory URL or `--scope hostname` to crawl siblings.
 
 For hash-routed SPA docs sites, enable hash preservation explicitly:
 
 ```bash
-npx @arabold/docs-mcp-server@latest scrape my-spa https://docs.example.com/#/guide --preserve-hashes
+npx @siamakerlab/android-docs-mcp-server@latest scrape my-spa https://docs.example.com/#/guide --preserve-hashes
 ```
 
 **2. Query the index:**
 
 ```bash
-npx @arabold/docs-mcp-server@latest search react "useEffect cleanup" --output yaml
+npx @siamakerlab/android-docs-mcp-server@latest search kotlin "coroutine scope builder" --output yaml
 ```
 
 **3. Fetch a single page as Markdown:**
 
 ```bash
-npx @arabold/docs-mcp-server@latest fetch-url https://react.dev/reference/react/useEffect
+npx @siamakerlab/android-docs-mcp-server@latest fetch-url https://kotlinlang.org/docs/coroutines-basics.html
 ```
 
 ### Output Behavior
@@ -150,7 +154,7 @@ If you want a long-running MCP endpoint for Claude, Cline, Copilot, Gemini CLI, 
 **1. Start the server:**
 
 ```bash
-npx @arabold/docs-mcp-server@latest
+npx @siamakerlab/android-docs-mcp-server@latest
 ```
 
 **2. Open the Web UI** at **[http://localhost:6280](http://localhost:6280)** to add documentation.
@@ -160,7 +164,7 @@ npx @arabold/docs-mcp-server@latest
 ```json
 {
   "mcpServers": {
-    "docs-mcp-server": {
+    "android-docs": {
       "type": "sse",
       "url": "http://localhost:6280/sse"
     }
@@ -181,7 +185,7 @@ docker run --rm \
   -v docs-mcp-data:/data \
   -v docs-mcp-config:/config \
   -p 6280:6280 \
-  ghcr.io/arabold/docs-mcp-server:latest \
+  ghcr.io/siamakerlab/android-docs-mcp-server:latest \
   --protocol http --host 0.0.0.0 --port 6280
 ```
 
@@ -194,7 +198,7 @@ Using an embedding model is **optional** but dramatically improves search qualit
 **Example: Enable OpenAI Embeddings**
 
 ```bash
-OPENAI_API_KEY="sk-proj-..." npx @arabold/docs-mcp-server@latest
+OPENAI_API_KEY="sk-proj-..." npx @siamakerlab/android-docs-mcp-server@latest
 ```
 
 See **[Embedding Models](docs/guides/embedding-models.md)** for configuring **Ollama**, **Gemini**, **Azure**, and others.
