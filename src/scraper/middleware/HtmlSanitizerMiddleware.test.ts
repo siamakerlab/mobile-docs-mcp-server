@@ -67,6 +67,39 @@ describe("HtmlSanitizerMiddleware", () => {
     // No close needed
   });
 
+  it("removes API-doc generator chrome but keeps signatures and descriptions", async () => {
+    const middleware = new HtmlSanitizerMiddleware();
+    const html = `
+      <html><body>
+        <div class="flex-header"><ul class="sub-nav-list"><li>OVERVIEW</li></ul></div>
+        <div class="skip-nav">Skip navigation links</div>
+        <nav class="breadcrumbs gt-separated"><span class="self-crumb">Gson</span></nav>
+        <div class="search-sidebar">search</div>
+        <main>
+          <section class="class-description"><div class="block">A JSON serializer.</div></section>
+          <div class="signature">String toJson(Object src)</div>
+        </main>
+      </body></html>`;
+    const context = createMockContext(html);
+    const next = vi.fn().mockResolvedValue(undefined);
+
+    await middleware.process(context, next);
+    if (!context.dom) throw new Error("DOM not defined");
+
+    // API-doc chrome is removed.
+    expect(context.dom(".flex-header").length).toBe(0);
+    expect(context.dom(".sub-nav-list").length).toBe(0);
+    expect(context.dom(".skip-nav").length).toBe(0);
+    expect(context.dom(".breadcrumbs").length).toBe(0);
+    expect(context.dom(".self-crumb").length).toBe(0);
+    expect(context.dom(".search-sidebar").length).toBe(0);
+    // Reference content survives.
+    expect(context.dom(".class-description").text()).toContain("A JSON serializer");
+    expect(context.dom(".block").length).toBe(1);
+    expect(context.dom(".signature").text()).toContain("toJson");
+    expect(context.errors).toHaveLength(0);
+  });
+
   it("should remove custom unwanted elements via excludeSelectors", async () => {
     const customSelectors = [".remove-me", "#specific-id"];
     const middleware = new HtmlSanitizerMiddleware();

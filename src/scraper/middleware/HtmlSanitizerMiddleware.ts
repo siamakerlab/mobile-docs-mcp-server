@@ -1,4 +1,5 @@
 import { logger } from "../../utils/logger";
+import { API_DOC_CHROME_SELECTORS } from "./apiDocChrome";
 import type { ContentProcessorMiddleware, MiddlewareContext } from "./types";
 
 /**
@@ -165,6 +166,9 @@ export class HtmlSanitizerMiddleware implements ContentProcessorMiddleware {
     "#st-search-input",
     "#st-results-container",
     ".st-default-search-input",
+    // API-documentation generator chrome (Javadoc / Dokka-KDoc / Dartdoc).
+    // Generator-specific nav/breadcrumb/skip-link selectors; see apiDocChrome.ts.
+    ...API_DOC_CHROME_SELECTORS,
   ];
 
   async process(context: MiddlewareContext, next: () => Promise<void>): Promise<void> {

@@ -57,7 +57,7 @@ declares" with grounded, version-correct citations — without the operator hand
 | 0 | Fork foundations & sync hygiene | repo meta, `ANDROID.md` | ✅ (benchmark → Phase 5) |
 | 1 | Source-code intelligence (Kotlin/Java/Dart) | `src/splitter/treesitter/` | ✅ java + kotlin (dart: line-based, AST follow-up) |
 | 2 | Ecosystem package registries | `src/scraper/strategies/` | ✅ 5 host strategies + docUrl mapping |
-| 3 | API-doc pipelines (Javadoc/KDoc/Dartdoc) | `src/scraper/middleware/`, `pipelines/` | ⬜ |
+| 3 | API-doc pipelines (Javadoc/KDoc/Dartdoc) | `src/scraper/middleware/` | 🟡 chrome removal (real-HTML verified) |
 | 4 | Project-aware version resolution | `src/manifest/`, `src/tools/` | 🟡 parsers + resolve/scrape-project + search wiring |
 | 5 | Search quality tuning for Android | `tests/search-eval/`, retriever | ⬜ |
 | 6 | Agent Skills & developer experience | `skills/`, docs, CLI ergonomics | ⬜ |
@@ -218,8 +218,12 @@ is dense with navigation chrome, frames, and boilerplate.
 and `HtmlPipeline.ts`. Prefer new/tuned middleware over rewriting the chain.
 
 **Tasks**
-- ⬜ Recognizers for **Javadoc**, **Dokka/KDoc**, and **Dartdoc** HTML layouts;
-  strip nav/frames, keep signature blocks, parameter tables, and descriptions.
+- ✅ Strip API-doc generator chrome — `apiDocChrome.ts` adds generator-specific
+  nav/sub-nav/breadcrumb/skip-link selectors (Javadoc new + old style, Dartdoc, Dokka)
+  to `HtmlSanitizerMiddleware`. Verified against **real `/static/` Javadoc and Dartdoc
+  HTML** so signatures, descriptions, and summary tables survive; broad classes
+  (`.header`/`.nav`/`.sidebar`/layout containers) are deliberately excluded to avoid
+  false positives on ordinary sites.
 - ⬜ Special handling for **`developer.android.com`** (reference + guides) and
   **`kotlinlang.org`** structures.
 - ⬜ Preserve fully-qualified names and method signatures through
