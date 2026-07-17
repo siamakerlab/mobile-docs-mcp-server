@@ -8,5 +8,6 @@ export * from "./ListJobsTool";
 export * from "./ListLibrariesTool";
 export * from "./RefreshVersionTool";
 export * from "./RemoveTool";
+export * from "./ResolveProjectDepsTool";
 export * from "./ScrapeTool";
 export * from "./SearchTool";

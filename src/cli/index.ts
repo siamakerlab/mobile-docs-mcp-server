@@ -22,6 +22,7 @@ import { createListCommand } from "./commands/list";
 import { createMcpCommand } from "./commands/mcp";
 import { createRefreshCommand } from "./commands/refresh";
 import { createRemoveCommand } from "./commands/remove";
+import { createResolveProjectDepsCommand } from "./commands/resolveProjectDeps";
 import { createScrapeCommand } from "./commands/scrape";
 import { createSearchCommand } from "./commands/search";
 import { createWebCommand } from "./commands/web";
@@ -172,6 +173,7 @@ export function createCli(argv: string[]): Argv {
   createMcpCommand(cli);
   createRefreshCommand(cli);
   createRemoveCommand(cli);
+  createResolveProjectDepsCommand(cli);
   createScrapeCommand(cli);
   createSearchCommand(cli);
   createWebCommand(cli);

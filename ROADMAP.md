@@ -58,7 +58,7 @@ declares" with grounded, version-correct citations — without the operator hand
 | 1 | Source-code intelligence (Kotlin/Java/Dart) | `src/splitter/treesitter/` | ✅ java + kotlin (dart: line-based, AST follow-up) |
 | 2 | Ecosystem package registries | `src/scraper/strategies/` | 🟡 pub.dev + javadoc.io + gradle-plugins done |
 | 3 | API-doc pipelines (Javadoc/KDoc/Dartdoc) | `src/scraper/middleware/`, `pipelines/` | ⬜ |
-| 4 | Project-aware version resolution | `src/manifest/`, `src/tools/` | 🟡 gradle catalog + pubspec parsers |
+| 4 | Project-aware version resolution | `src/manifest/`, `src/tools/` | 🟡 parsers + resolve-project-deps (CLI) |
 | 5 | Search quality tuning for Android | `tests/search-eval/`, retriever | ⬜ |
 | 6 | Agent Skills & developer experience | `skills/`, docs, CLI ergonomics | ⬜ |
 | 7 | Distribution & pre-seeded indexes | Docker, release pipeline | ⬜ |
@@ -245,9 +245,12 @@ expose a new tool in `src/tools/` (inherited by CLI/MCP/Web).
   coordinate→version list tagged by ecosystem (`maven` / `gradle-plugin` / `pub`).
   **Follow-up:** `build.gradle(.kts)` + `settings.gradle(.kts)` (regex, best-effort)
   and `pubspec.lock`.
-- ⬜ New tool `resolve-project-deps` (working name): given a project root, discover
-  and parse the manifests, emit the resolved coordinate→version set, and offer to
-  scrape/search against those versions via the Phase 2 registries.
+- 🟡 Tool `resolve-project-deps` — **done (CLI):** `ResolveProjectDepsTool` +
+  `resolveProjectManifests` walk a project root, parse every recognized manifest, and
+  emit the de-duplicated coordinate→version set
+  (`docs-mcp-server resolve-project-deps [path] --output json`). Store-free (filesystem
+  only) so every interface can reuse it. **Follow-up:** expose over MCP; offer to
+  scrape/search those versions via the Phase 2 registries.
 - ⬜ Wire resolved versions into `SearchTool` so queries default to the project's
   versions when a project context is provided.
 
