@@ -60,7 +60,7 @@ declares" with grounded, version-correct citations — without the operator hand
 | 3 | API-doc pipelines (Javadoc/KDoc/Dartdoc) | `src/scraper/middleware/` | 🟡 chrome removal (real-HTML verified) |
 | 4 | Project-aware version resolution | `src/manifest/`, `src/tools/` | ✅ parsers + resolve/scrape-project + search wiring |
 | 5 | Search quality tuning for Android | `tests/search-eval/` | 🟡 android qrel dataset (draft) |
-| 6 | Agent Skills & developer experience | `skills/`, docs, CLI ergonomics | ⬜ |
+| 6 | Agent Skills & developer experience | `skills/`, docs | 🟡 android-project-docs skill + recipes |
 | 7 | Distribution & pre-seeded indexes | Docker, release pipeline | ⬜ |
 
 The **critical path** is Phase 1 → Phase 4: without Kotlin/Java/Dart chunking
@@ -323,13 +323,17 @@ the Phase 0 baseline, with regressions gating.
 **Goal:** make the Android workflow turnkey for AI assistants and humans.
 
 **Tasks**
-- ⬜ Add Android-focused **Agent Skills** under `skills/` (index an AGP/Compose
-  dependency, resolve project versions, search Kotlin APIs).
-- ⬜ Provide ready-made **scrape recipes** for the canonical sources
-  (developer.android.com, kotlinlang.org, api.flutter.dev, docs.gradle.org).
-- ⬜ Document MCP client setup examples aimed at Android tooling (Android Studio +
-  MCP-capable assistants, Gemini CLI, Claude).
-- ⬜ CLI ergonomics: coordinate-aware `scrape`/`search` examples in `README.md`.
+- ✅ Android-focused **Agent Skill** — `skills/android-project-docs/SKILL.md` teaches
+  the resolve → scrape-project → search-with-`--project` flow plus Kotlin/Java source
+  indexing, in the same SKILL.md format as the upstream skills.
+- ✅ Ready-made **scrape recipes** for the canonical sources (developer.android.com,
+  kotlinlang.org, api.flutter.dev, docs.gradle.org, javadoc.io `/static/`) — included in
+  the skill.
+- ✅ CLI ergonomics — the README "Android workflow" section and the skill document the
+  resolve/scrape-project/search commands end-to-end.
+- ⬜ MCP client setup examples aimed specifically at Android tooling (Android Studio +
+  MCP-capable assistants, Gemini CLI) — general client setup already lives in
+  `docs/guides/mcp-clients.md`.
 
 **Done when:** a new user can go from "connect server" to "search my project's
 exact Compose version" by following documented skills/recipes.
