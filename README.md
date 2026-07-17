@@ -1,8 +1,25 @@
 # Grounded Docs: Your AI's Up-to-Date Documentation Expert
 
+> **Note — This is a fork.** This repository is a fork of the excellent [`arabold/docs-mcp-server`](https://github.com/arabold/docs-mcp-server). Our sincere gratitude goes to [@arabold](https://github.com/arabold) and all the original contributors for taking on the hard problems and solving them so gracefully, then generously open-sourcing the result. This project builds gladly on the strong foundation they laid. All credit for the original design and implementation belongs to them.
+
 **Docs MCP Server** solves the problem of AI hallucinations and outdated knowledge by providing a personal, always-current documentation index for your AI coding assistant. It fetches official docs from websites, GitHub, npm, PyPI, and local files, allowing your AI to query the exact version you are using.
 
 ![Docs MCP Server Web Interface](docs/docs-mcp-server.png)
+
+## 🤖 About This Fork — Android-First
+
+This fork adapts Grounded Docs into a documentation companion purpose-built for **Android and mobile app development**. Upstream is an outstanding general-purpose documentation indexer; our goal is to refine and extend it so it excels specifically at the sources, formats, and workflows an Android developer reaches for every day.
+
+**Focus ecosystems:**
+
+-   **Kotlin** — language reference, coroutines, Jetpack, Kotlin Multiplatform.
+-   **Java** — JVM APIs and Android's Java interop surface.
+-   **Flutter / Dart** — framework documentation and pub.dev package references.
+-   **Gradle** — the build system, Android Gradle Plugin, and plugin DSL.
+
+**Ultimate goal:** keep the powerful indexing and hybrid semantic-search core intact while tuning ingestion, formatting, and defaults toward the Android / JVM / Flutter documentation an AI coding assistant needs to stay accurate and version-aware. Everything here is a set of incremental modifications and improvements layered on top of upstream — full credit for the original design and implementation belongs to the [original authors](https://github.com/arabold/docs-mcp-server).
+
+See the **[ROADMAP](ROADMAP.md)** for the detailed, phased plan to get there.
 
 ## ✨ Why Grounded Docs MCP Server?
 
