@@ -320,6 +320,32 @@ ${r.content}\n`,
     },
   );
 
+  server.tool(
+    "resolve_project_deps",
+    "Resolve the dependencies a project declares by parsing its build manifests (Gradle version catalog `libs.versions.toml`, Flutter `pubspec.yaml`). Use to discover the exact library coordinates and versions a project uses, so you can then scrape or search version-specific documentation.",
+    {
+      path: z.string().trim().describe("Path to the project root to scan."),
+    },
+    {
+      title: "Resolve Project Dependencies",
+      readOnlyHint: true,
+      destructiveHint: false,
+    },
+    async ({ path }) => {
+      telemetry.track(TelemetryEvent.TOOL_USED, {
+        tool: "resolve_project_deps",
+        context: "mcp_server",
+      });
+
+      try {
+        const result = await tools.resolveProjectDeps.execute({ path });
+        return createResponse(JSON.stringify(result, null, 2));
+      } catch (error) {
+        return createError(error);
+      }
+    },
+  );
+
   // Job and write tools - only available when not in read-only mode
   if (!readOnly) {
     // List jobs tool - suppress deep inference issues

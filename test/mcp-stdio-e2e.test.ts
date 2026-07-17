@@ -97,6 +97,7 @@ describe("MCP stdio server E2E", () => {
     const toolNames = toolsResult.tools.map((t) => t.name);
     expect(toolNames).toContain("search_docs");
     expect(toolNames).toContain("list_libraries");
+    expect(toolNames).toContain("resolve_project_deps");
   }, 30000);
 
   it("should handle shutdown gracefully", async () => {
