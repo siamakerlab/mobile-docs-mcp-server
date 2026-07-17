@@ -36,6 +36,9 @@ const mockTools: McpServerTools = {
   resolveProjectDeps: {
     execute: vi.fn(async () => ({ dependencies: [], warnings: [] })),
   } as any,
+  scrapeProject: {
+    execute: vi.fn(async () => ({ jobs: [], skipped: [], warnings: [] })),
+  } as any,
   scrape: {
     execute: vi.fn(async () => ({ jobId: "job-123" })),
   } as any,

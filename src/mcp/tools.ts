@@ -16,6 +16,7 @@ import {
   RefreshVersionTool,
   RemoveTool,
   ResolveProjectDepsTool,
+  ScrapeProjectTool,
   ScrapeTool,
   SearchTool,
 } from "../tools";
@@ -36,6 +37,7 @@ export interface McpServerTools {
   remove: RemoveTool;
   fetchUrl: FetchUrlTool;
   resolveProjectDeps: ResolveProjectDepsTool;
+  scrapeProject: ScrapeProjectTool;
 }
 
 /**
@@ -64,6 +66,7 @@ export async function initializeTools(
     remove: new RemoveTool(docService, pipeline),
     fetchUrl: new FetchUrlTool(new AutoDetectFetcher(config.scraper), config),
     resolveProjectDeps: new ResolveProjectDepsTool(),
+    scrapeProject: new ScrapeProjectTool(pipeline, config.scraper),
   };
 
   return tools;

@@ -24,6 +24,7 @@ import { createRefreshCommand } from "./commands/refresh";
 import { createRemoveCommand } from "./commands/remove";
 import { createResolveProjectDepsCommand } from "./commands/resolveProjectDeps";
 import { createScrapeCommand } from "./commands/scrape";
+import { createScrapeProjectCommand } from "./commands/scrapeProject";
 import { createSearchCommand } from "./commands/search";
 import { createWebCommand } from "./commands/web";
 import { createWorkerCommand } from "./commands/worker";
@@ -175,6 +176,7 @@ export function createCli(argv: string[]): Argv {
   createRemoveCommand(cli);
   createResolveProjectDepsCommand(cli);
   createScrapeCommand(cli);
+  createScrapeProjectCommand(cli);
   createSearchCommand(cli);
   createWebCommand(cli);
   createWorkerCommand(cli);

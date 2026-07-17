@@ -9,5 +9,6 @@ export * from "./ListLibrariesTool";
 export * from "./RefreshVersionTool";
 export * from "./RemoveTool";
 export * from "./ResolveProjectDepsTool";
+export * from "./ScrapeProjectTool";
 export * from "./ScrapeTool";
 export * from "./SearchTool";

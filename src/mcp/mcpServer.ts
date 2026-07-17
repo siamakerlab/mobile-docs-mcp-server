@@ -132,6 +132,32 @@ export function createMcpServerInstance(
       },
     );
 
+    server.tool(
+      "scrape_project",
+      "Resolve a project's declared dependencies (Gradle version catalog / build.gradle / pubspec) and enqueue a documentation scrape job for each one, targeting the registry doc URL (javadoc.io / pub.dev / plugins.gradle.org) at the declared version. One-shot way to index every library version a project uses. Returns the enqueued jobs and any skipped dependencies; monitor progress with list_jobs.",
+      {
+        path: z.string().trim().describe("Path to the project root to scan."),
+      },
+      {
+        title: "Scrape Project Dependencies",
+        destructiveHint: true, // replaces existing docs per dependency
+        openWorldHint: true, // requires internet access
+      },
+      async ({ path }) => {
+        telemetry.track(TelemetryEvent.TOOL_USED, {
+          tool: "scrape_project",
+          context: "mcp_server",
+        });
+
+        try {
+          const result = await tools.scrapeProject.execute({ path });
+          return createResponse(JSON.stringify(result, null, 2));
+        } catch (error) {
+          return createError(error);
+        }
+      },
+    );
+
     // Refresh version tool - suppress deep inference issues
     server.tool(
       "refresh_version",

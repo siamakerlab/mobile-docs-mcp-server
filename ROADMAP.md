@@ -58,7 +58,7 @@ declares" with grounded, version-correct citations — without the operator hand
 | 1 | Source-code intelligence (Kotlin/Java/Dart) | `src/splitter/treesitter/` | ✅ java + kotlin (dart: line-based, AST follow-up) |
 | 2 | Ecosystem package registries | `src/scraper/strategies/` | 🟡 pub.dev + javadoc.io + gradle-plugins done |
 | 3 | API-doc pipelines (Javadoc/KDoc/Dartdoc) | `src/scraper/middleware/`, `pipelines/` | ⬜ |
-| 4 | Project-aware version resolution | `src/manifest/`, `src/tools/` | 🟡 parsers + resolve-project-deps + search version wiring |
+| 4 | Project-aware version resolution | `src/manifest/`, `src/tools/` | 🟡 parsers + resolve/scrape-project + search wiring |
 | 5 | Search quality tuning for Android | `tests/search-eval/`, retriever | ⬜ |
 | 6 | Agent Skills & developer experience | `skills/`, docs, CLI ergonomics | ⬜ |
 | 7 | Distribution & pre-seeded indexes | Docker, release pipeline | ⬜ |
@@ -254,13 +254,18 @@ expose a new tool in `src/tools/` (inherited by CLI/MCP/Web).
   **MCP** (`resolve_project_deps`, read-only; registration verified in `mcp-stdio-e2e`).
   Each resolved dependency also carries a `docUrl` (via `documentationUrl`) pointing at
   the Phase 2 registry page — javadoc.io / pub.dev / plugins.gradle.org, versioned when
-  the declared version is a concrete pin — so results feed straight into `scrape`.
-  **Follow-up:** a one-shot "scrape all project deps" flow; SearchTool version defaults.
+  the declared version is a concrete pin — so results feed straight into `scrape`, or
+  use the one-shot project scrape below.
 - ✅ Wire resolved versions into `SearchTool` — it accepts an optional `projectPath`;
   when set and no explicit version is given, searches default to the concrete version
   the project declares for the library (`projectVersionForLibrary`, matching by exact
   coordinate or Maven artifact name; pinned versions only). Exposed as
   `search --project <path>` (CLI) and the `projectPath` param on `search_docs` (MCP).
+- ✅ One-shot project scrape — `ScrapeProjectTool` resolves the project, maps each
+  coordinate to its doc URL, and enqueues a scrape job per dependency (pinned version
+  or unversioned; unmappable coordinates reported as `skipped`). Exposed as
+  `scrape-project [path]` (CLI — waits for all jobs) and `scrape_project` (MCP —
+  enqueues and returns jobs; monitor via `list_jobs`).
 
 **Risks:** Gradle's dynamic versions (`+`, `latest.release`), catalog aliases, and
 Kotlin-DSL expressions resist static parsing. **Mitigation:** parse the common
