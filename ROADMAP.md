@@ -239,12 +239,14 @@ versions a project declares, instead of asking the user to specify them.
 expose a new tool in `src/tools/` (inherited by CLI/MCP/Web).
 
 **Tasks**
-- 🟡 Manifest parsers (`src/manifest/`) — **done:** Gradle Version Catalog
-  (`gradle/libs.versions.toml`, via `smol-toml`) and Flutter `pubspec.yaml`
-  (`yaml`), both pure and unit-tested, normalizing to a flat
-  coordinate→version list tagged by ecosystem (`maven` / `gradle-plugin` / `pub`).
-  **Follow-up:** `build.gradle(.kts)` + `settings.gradle(.kts)` (regex, best-effort)
-  and `pubspec.lock`.
+- ✅ Manifest parsers (`src/manifest/`) — Gradle Version Catalog
+  (`gradle/libs.versions.toml`, via `smol-toml`), **`build.gradle(.kts)`** (best-effort
+  regex for inline `group:artifact:version` coordinates and `id(...) version` plugins),
+  and Flutter `pubspec.yaml` (`yaml`), all pure and unit-tested, normalizing to a flat
+  coordinate→version list tagged by ecosystem (`maven` / `gradle-plugin` / `pub`) and
+  discovered recursively by `resolveProjectManifests`.
+  **Follow-up:** `settings.gradle(.kts)` and `pubspec.lock` (the latter needs
+  lock-over-yaml precedence when both exist in a module).
 - ✅ Tool `resolve-project-deps` — `ResolveProjectDepsTool` + `resolveProjectManifests`
   walk a project root, parse every recognized manifest, and emit the de-duplicated
   coordinate→version set. Store-free (filesystem only) so every interface reuses it.

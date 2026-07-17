@@ -73,6 +73,25 @@ agp = { id = "com.android.application", version = "8.2.0" }
     expect(dependencies.filter((d) => d.coordinate === "http")).toHaveLength(1);
   });
 
+  it("discovers build.gradle.kts inline dependencies", async () => {
+    await fsPromises.mkdir(path.join(root, "app"), { recursive: true });
+    await fsPromises.writeFile(
+      path.join(root, "app", "build.gradle.kts"),
+      `plugins {
+    id("com.android.application") version "8.2.0"
+}
+dependencies {
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+}
+`,
+    );
+
+    const { dependencies } = await resolveProjectManifests(root);
+    const coords = dependencies.map((d) => d.coordinate);
+    expect(coords).toContain("com.squareup.okhttp3:okhttp");
+    expect(coords).toContain("com.android.application");
+  });
+
   it("returns an empty result (no throw) for an empty directory", async () => {
     const { dependencies, warnings } = await resolveProjectManifests(root);
     expect(dependencies).toEqual([]);
