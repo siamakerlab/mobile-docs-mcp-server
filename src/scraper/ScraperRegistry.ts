@@ -3,6 +3,7 @@ import { ScraperError } from "../utils/errors";
 import { logger } from "../utils/logger";
 import { validateUrl } from "../utils/url";
 import { GitHubScraperStrategy } from "./strategies/GitHubScraperStrategy";
+import { GradlePluginScraperStrategy } from "./strategies/GradlePluginScraperStrategy";
 import { JavadocScraperStrategy } from "./strategies/JavadocScraperStrategy";
 import { LocalFileStrategy } from "./strategies/LocalFileStrategy";
 import { NpmScraperStrategy } from "./strategies/NpmScraperStrategy";
@@ -60,6 +61,11 @@ export class ScraperRegistry {
       return new JavadocScraperStrategy(this.config);
     }
 
+    if (isGradlePluginUrl(url)) {
+      logger.debug(`Using strategy "GradlePluginScraperStrategy" for URL: ${url}`);
+      return new GradlePluginScraperStrategy(this.config);
+    }
+
     if (isGitHubUrl(url)) {
       logger.debug(`Using strategy "GitHubScraperStrategy" for URL: ${url}`);
       return new GitHubScraperStrategy(this.config);
@@ -109,6 +115,15 @@ function isJavadocUrl(url: string): boolean {
   try {
     const { hostname } = new URL(url);
     return ["javadoc.io", "www.javadoc.io"].includes(hostname);
+  } catch {
+    return false;
+  }
+}
+
+function isGradlePluginUrl(url: string): boolean {
+  try {
+    const { hostname } = new URL(url);
+    return ["plugins.gradle.org", "www.plugins.gradle.org"].includes(hostname);
   } catch {
     return false;
   }

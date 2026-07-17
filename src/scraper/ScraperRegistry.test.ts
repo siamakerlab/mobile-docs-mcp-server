@@ -3,6 +3,7 @@ import { loadConfig } from "../utils/config";
 import { ScraperError } from "../utils/errors";
 import { ScraperRegistry } from "./ScraperRegistry";
 import { GitHubScraperStrategy } from "./strategies/GitHubScraperStrategy";
+import { GradlePluginScraperStrategy } from "./strategies/GradlePluginScraperStrategy";
 import { JavadocScraperStrategy } from "./strategies/JavadocScraperStrategy";
 import { LocalFileStrategy } from "./strategies/LocalFileStrategy";
 import { NpmScraperStrategy } from "./strategies/NpmScraperStrategy";
@@ -57,6 +58,14 @@ describe("ScraperRegistry", () => {
       "https://javadoc.io/doc/com.squareup.okhttp3/okhttp",
     );
     expect(strategy).toBeInstanceOf(JavadocScraperStrategy);
+  });
+
+  it("should return GradlePluginScraperStrategy for plugins.gradle.org URLs", () => {
+    const registry = new ScraperRegistry(appConfig);
+    const strategy = registry.getStrategy(
+      "https://plugins.gradle.org/plugin/com.android.application",
+    );
+    expect(strategy).toBeInstanceOf(GradlePluginScraperStrategy);
   });
 
   it("should return WebScraperStrategy for generic HTTP URLs", () => {

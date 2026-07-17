@@ -56,7 +56,7 @@ declares" with grounded, version-correct citations — without the operator hand
 |------|-------|----------------------|--------|
 | 0 | Fork foundations & sync hygiene | repo meta, CI, benchmark baseline | ⬜ |
 | 1 | Source-code intelligence (Kotlin/Java/Dart) | `src/splitter/treesitter/` | ✅ java + kotlin (dart: line-based, AST follow-up) |
-| 2 | Ecosystem package registries | `src/scraper/strategies/` | 🟡 pub.dev + javadoc.io done |
+| 2 | Ecosystem package registries | `src/scraper/strategies/` | 🟡 pub.dev + javadoc.io + gradle-plugins done |
 | 3 | API-doc pipelines (Javadoc/KDoc/Dartdoc) | `src/scraper/middleware/`, `pipelines/` | ⬜ |
 | 4 | Project-aware version resolution | `src/tools/`, new manifest parsers | ⬜ |
 | 5 | Search quality tuning for Android | `tests/search-eval/`, retriever | ⬜ |
@@ -190,7 +190,9 @@ register them in `src/scraper/ScraperRegistry.ts` behind new URL schemes/handler
 - ⬜ **Google Maven strategy** — `dl.google.com/.../maven2` (AndroidX/AGP). Deferred:
   these artifacts have no canonical hosted doc page, so coordinate→docs URL mapping is
   an open design question (see below). AndroidX docs largely live on developer.android.com.
-- ⬜ **Gradle Plugin Portal strategy** — resolve plugins by id + version.
+- ✅ **Gradle Plugin Portal strategy** — `GradlePluginScraperStrategy` recognizes
+  `plugins.gradle.org` (plugin pages keyed by id, e.g. `/plugin/com.android.application`).
+  Registered and tested.
 - ⬜ Introduce a coordinate-parsing utility so `ScrapeTool`/`FindVersionTool`
   accept ecosystem-native identifiers (`androidx.compose.ui:ui:1.x`,
   `dart:pubspec` names, `com.android.application` plugin ids). Ties into Phase 4.
