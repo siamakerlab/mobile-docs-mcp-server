@@ -88,7 +88,10 @@ a follow-up sub-task rather than a Phase 1 blocker.
       end-to-end (a `.kt` file splits into package/import/class/method/companion/
       companion-fn/data-class boundaries). `.kt`/`.kts` already routed to
       `text/x-kotlin`, so no MIME fix was needed (unlike Java).
+- [x] Wire `.dart` (and any language without an AST grammar) to the line-based
+      fallback — done: `TreesitterSourceCodeSplitter` logs a `logger.debug` note and
+      falls back, proven content-preserving and regression-tested. A dedicated Dart
+      grammar (options above) remains a follow-up, not a Phase 1 blocker.
 - [ ] Re-run the grammar load test on **Node 22** and record the result here
       (validated on Node 24 so far; N-API makes this low-risk).
-- [ ] Decide Dart path (options above); wire `.dart` fallback + warning meanwhile.
 - [ ] Add the chosen grammars to the Phase 7 Docker build check.

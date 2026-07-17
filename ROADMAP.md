@@ -55,7 +55,7 @@ declares" with grounded, version-correct citations — without the operator hand
 | Phase | Theme | Primary code surface | Status |
 |------|-------|----------------------|--------|
 | 0 | Fork foundations & sync hygiene | repo meta, CI, benchmark baseline | ⬜ |
-| 1 | Source-code intelligence (Kotlin/Java/Dart) | `src/splitter/treesitter/` | 🟡 java + kotlin done, dart deferred |
+| 1 | Source-code intelligence (Kotlin/Java/Dart) | `src/splitter/treesitter/` | ✅ java + kotlin (dart: line-based, AST follow-up) |
 | 2 | Ecosystem package registries | `src/scraper/strategies/` | ⬜ |
 | 3 | API-doc pipelines (Javadoc/KDoc/Dartdoc) | `src/scraper/middleware/`, `pipelines/` | ⬜ |
 | 4 | Project-aware version resolution | `src/tools/`, new manifest parsers | ⬜ |
@@ -135,9 +135,11 @@ signatures and doc comments — exactly the content an assistant needs intact.
   interfaces (told apart via `enum_class_body` / declaration-header keyword).
   Did **not** adopt `@tree-sitter-grammars/tree-sitter-kotlin@1.1.0` (needs core
   `^0.22.4`) — that stays gated behind a scheduled core upgrade + TS/Python re-validation.
-- ❄️ **DartParser** — deferred. No usable npm grammar (only NAN-based `tree-sitter-dart@1.0.0`,
-  fails to load: `Invalid language object`). Interim: route `.dart` through
-  `TextDocumentSplitter` with a warning; revisit via vendored/self-built grammar.
+- ❄️ **DartParser** — deferred (no usable npm grammar: NAN-based `tree-sitter-dart@1.0.0`
+  fails to load, `Invalid language object`). Interim **shipped**: `.dart` routes through
+  the line-based fallback in `TreesitterSourceCodeSplitter` — proven content-preserving,
+  logged at `logger.debug`, and regression-tested. A dedicated grammar (vendored or
+  self-built) is a follow-up, not a Phase 1 blocker.
 - ⬜ Extend `languageTypes.ts` / extension + MIME maps; add each language to
   `docs/concepts/supported-formats.md`.
 - ⬜ Fixtures + `*.test.ts` per parser (real Kotlin/Java snippets), plus a
@@ -158,6 +160,13 @@ signatures and doc comments — exactly the content an assistant needs intact.
 **Done when:** indexing a Kotlin/Java/Dart file produces symbol- and doc-aligned
 chunks, verified by tests, with a measurable retrieval improvement over the
 line-based baseline.
+
+**Status (2026-07-17) — Phase 1 core complete.** Java and Kotlin ship AST-aware
+chunking (parsers + registry + unit + end-to-end tests, all green on Node 24). Java
+also required a `.java` MIME fix so it reaches the SourceCodePipeline. Dart is indexed
+today via the line-based fallback (content-preserving, debug-logged, regression-tested);
+a dedicated Dart grammar and the Node 22 re-validation remain tracked follow-ups. See
+[`docs/spikes/phase1-treesitter-grammars.md`](docs/spikes/phase1-treesitter-grammars.md).
 
 ---
 

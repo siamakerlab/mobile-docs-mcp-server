@@ -1,4 +1,5 @@
 import { defaults } from "../../utils/config";
+import { logger } from "../../utils/logger";
 import { TextContentSplitter } from "../splitters/TextContentSplitter";
 import type { Chunk, DocumentSplitter, SplitterConfig } from "../types";
 import { LanguageParserRegistry } from "./LanguageParserRegistry";
@@ -33,7 +34,11 @@ export class TreesitterSourceCodeSplitter implements DocumentSplitter {
     // Try to get a parser for this content type
     const parser = this.getParserForContent(contentType);
     if (!parser) {
-      // Fall back to TextContentSplitter for unsupported languages
+      // No AST grammar for this language (e.g. Dart, Scala) — still indexed via
+      // line-based splitting, just without semantic boundaries.
+      logger.debug(
+        `No AST parser for content type "${contentType ?? "unknown"}"; using line-based splitting`,
+      );
       return this.fallbackToTextSplitter(content);
     }
 

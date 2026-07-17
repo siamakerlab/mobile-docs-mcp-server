@@ -52,8 +52,15 @@ describe("TreesitterSourceCodeSplitter", () => {
       expect(splitter.isSupportedContentType("application/x-python")).toBe(true);
     });
 
+    it("should support Java and Kotlin MIME types", () => {
+      expect(splitter.isSupportedContentType("text/x-java")).toBe(true);
+      expect(splitter.isSupportedContentType("text/x-kotlin")).toBe(true);
+    });
+
     it("should not support unsupported types", () => {
       expect(splitter.isSupportedContentType("text/ruby")).toBe(false);
+      // Dart has no AST grammar yet (Phase 1 deferred) — falls back to line-based.
+      expect(splitter.isSupportedContentType("text/x-dart")).toBe(false);
       expect(splitter.isSupportedContentType("text/plain")).toBe(false);
     });
 
@@ -123,6 +130,21 @@ end
       const chunks = await splitter.splitText(rubyCode, "text/ruby");
       expect(chunks.length).toBeGreaterThan(0);
       expect(chunks[0].types).toContain("code");
+    });
+
+    it("should still index Dart via line-based fallback (no AST grammar yet)", async () => {
+      const dartCode = `class Greeter {
+  final String name;
+  Greeter(this.name);
+  String greet() => 'Hello';
+}
+`;
+      const chunks = await splitter.splitText(dartCode, "text/x-dart");
+      expect(chunks.length).toBeGreaterThan(0);
+      expect(chunks[0].types).toContain("code");
+      const reconstructed = chunks.map((c) => c.content).join("");
+      expect(reconstructed).toContain("class Greeter");
+      expect(reconstructed).toContain("greet()");
     });
 
     it("should handle parse errors gracefully", async () => {
