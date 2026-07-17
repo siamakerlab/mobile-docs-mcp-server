@@ -250,7 +250,10 @@ expose a new tool in `src/tools/` (inherited by CLI/MCP/Web).
   coordinate→version set. Store-free (filesystem only) so every interface reuses it.
   Exposed over **CLI** (`docs-mcp-server resolve-project-deps [path] --output json`) and
   **MCP** (`resolve_project_deps`, read-only; registration verified in `mcp-stdio-e2e`).
-  **Follow-up:** offer to scrape/search those versions via the Phase 2 registries.
+  Each resolved dependency also carries a `docUrl` (via `documentationUrl`) pointing at
+  the Phase 2 registry page — javadoc.io / pub.dev / plugins.gradle.org, versioned when
+  the declared version is a concrete pin — so results feed straight into `scrape`.
+  **Follow-up:** a one-shot "scrape all project deps" flow; SearchTool version defaults.
 - ⬜ Wire resolved versions into `SearchTool` so queries default to the project's
   versions when a project context is provided.
 

@@ -322,7 +322,7 @@ ${r.content}\n`,
 
   server.tool(
     "resolve_project_deps",
-    "Resolve the dependencies a project declares by parsing its build manifests (Gradle version catalog `libs.versions.toml`, Flutter `pubspec.yaml`). Use to discover the exact library coordinates and versions a project uses, so you can then scrape or search version-specific documentation.",
+    "Resolve the dependencies a project declares by parsing its build manifests (Gradle version catalog `libs.versions.toml`, Flutter `pubspec.yaml`). Use to discover the exact library coordinates and versions a project uses. Each dependency includes a `docUrl` (javadoc.io / pub.dev / plugins.gradle.org) you can pass directly to `scrape_docs` to index that version's documentation.",
     {
       path: z.string().trim().describe("Path to the project root to scan."),
     },

@@ -1,4 +1,8 @@
-import { type ResolvedDependency, resolveProjectManifests } from "../manifest";
+import {
+  documentationUrl,
+  type ResolvedDependency,
+  resolveProjectManifests,
+} from "../manifest";
 import { ValidationError } from "./errors";
 
 export interface ResolveProjectDepsToolOptions {
@@ -6,9 +10,19 @@ export interface ResolveProjectDepsToolOptions {
   path: string;
 }
 
+/** A resolved dependency plus its registry documentation URL. */
+export interface ResolvedProjectDependency extends ResolvedDependency {
+  /**
+   * Documentation URL for the dependency's registry (javadoc.io / pub.dev /
+   * plugins.gradle.org), suitable for passing to `scrape`, or `null` if the
+   * coordinate cannot be mapped.
+   */
+  docUrl: string | null;
+}
+
 export interface ResolveProjectDepsToolResult {
   /** The de-duplicated dependencies declared across the project's manifests. */
-  dependencies: ResolvedDependency[];
+  dependencies: ResolvedProjectDependency[];
   /** Non-fatal notes (unresolved refs, SDK/git/path deps, unreadable files). */
   warnings: string[];
 }
@@ -37,6 +51,10 @@ export class ResolveProjectDepsTool {
       );
     }
 
-    return resolveProjectManifests(projectPath);
+    const { dependencies, warnings } = await resolveProjectManifests(projectPath);
+    return {
+      dependencies: dependencies.map((d) => ({ ...d, docUrl: documentationUrl(d) })),
+      warnings,
+    };
   }
 }

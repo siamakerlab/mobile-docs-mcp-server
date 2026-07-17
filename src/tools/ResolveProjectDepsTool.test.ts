@@ -22,7 +22,11 @@ describe("ResolveProjectDepsTool", () => {
       );
       const result = await tool.execute({ path: root });
       const provider = result.dependencies.find((d) => d.coordinate === "provider");
-      expect(provider).toMatchObject({ version: "6.1.1", ecosystem: "pub" });
+      expect(provider).toMatchObject({
+        version: "6.1.1",
+        ecosystem: "pub",
+        docUrl: "https://pub.dev/packages/provider/versions/6.1.1",
+      });
     } finally {
       await fsPromises.rm(root, { recursive: true, force: true });
     }
