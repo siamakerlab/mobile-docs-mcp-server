@@ -62,11 +62,11 @@ base commit in `CHANGELOG.md` on each sync. Switch to an independent line (e.g.
 
 ## Distribution
 
-Not published to npm yet. Before publishing, rename the distributable so it does not
-collide with upstream's `@arabold/docs-mcp-server` (new scope and/or `bin` name) while
-keeping attribution intact. Fork-specific commands (`resolve-project-deps`,
-`scrape-project`, Kotlin/Java AST chunking) require a local build (`npm run build`) or
-a global install of this fork.
+Published to npm as **`@siamakerlab/android-docs-mcp-server`** under the `android`
+dist-tag (renamed off upstream's `@arabold/docs-mcp-server`; `bin` kept as
+`docs-mcp-server`). Install with `npx @siamakerlab/android-docs-mcp-server@android` or
+`npm install -g`. Version follows the `<upstream-base>-android.<n>` scheme
+(`2.4.2-android.1`). Attribution to the original authors stays in `README.md` / `LICENSE`.
 
 **Node 22 only** — `better-sqlite3` and the tree-sitter grammars ship Node-ABI-pinned
 binaries. The current dev environment runs Node 24; grammar/DB loading was validated

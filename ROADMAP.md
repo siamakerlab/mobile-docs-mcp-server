@@ -79,9 +79,9 @@ incomplete. Phases 2, 3, 5, 6, 7 can proceed in parallel once 1 lands.
 - ✅ **Fork versioning decided** — SemVer with a fork-lineage pre-release suffix
   (`<upstream-base>-android.<n>`, e.g. `2.4.2-android.1`) while the API tracks upstream;
   switch to an independent line (`3.0.0`) once it diverges. Documented in `ANDROID.md`.
-- 🟡 **Distributable identity** — documented (`ANDROID.md` "Distribution"): rename off
-  `@arabold/docs-mcp-server` before any npm publish. Deferred as an action until a
-  publish actually happens (Phase 7); not published today.
+- ✅ **Distributable identity** — published to npm as
+  `@siamakerlab/android-docs-mcp-server` (`android` dist-tag, `2.4.2-android.1`),
+  renamed off upstream's `@arabold/docs-mcp-server`; `bin` kept as `docs-mcp-server`.
 - ✅ **`ANDROID.md`** describing the Android-specific subsystems, sync, and versioning.
 - ➡️ Android retrieval **benchmark baseline** — moved to Phase 5 (`tests/search-eval/`),
   where the search-quality work lives.

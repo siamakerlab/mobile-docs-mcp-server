@@ -23,9 +23,33 @@ See the **[ROADMAP](ROADMAP.md)** for the detailed, phased plan to get there.
 
 ### Android workflow (fork-specific)
 
-These commands use features added by this fork, so they assume a local build
-(`npm run build`) or a global install of this fork — the `resolve-project-deps`
-command and AST chunking for Kotlin/Java are not in upstream.
+These commands use features this fork adds on top of upstream (the
+`resolve-project-deps` / `scrape-project` commands and Kotlin/Java AST chunking).
+It's published to npm under the `android` dist-tag (requires **Node.js 22+**):
+
+```bash
+# Run on demand with npx …
+npx @siamakerlab/android-docs-mcp-server@android <command> [args]
+
+# … or install globally to get the `docs-mcp-server` command used below.
+npm install -g @siamakerlab/android-docs-mcp-server@android
+```
+
+Add it to an MCP client (Claude Desktop / Claude Code). Set `OPENAI_API_KEY` (or
+another embedding provider) in `env` for semantic search:
+
+```json
+{
+  "mcpServers": {
+    "android-docs": {
+      "command": "npx",
+      "args": ["-y", "@siamakerlab/android-docs-mcp-server@android", "--protocol", "stdio"]
+    }
+  }
+}
+```
+
+Then, from the CLI:
 
 ```bash
 # 1. See exactly what your project depends on — each result carries a docUrl
