@@ -4,4 +4,5 @@ export * from "./documentationUrl";
 export * from "./gradleVersionCatalog";
 export * from "./projectVersion";
 export * from "./pubspec";
+export * from "./pubspecLock";
 export * from "./types";

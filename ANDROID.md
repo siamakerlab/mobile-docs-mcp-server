@@ -31,9 +31,10 @@ Note: javadoc.io's `/doc/…` page is a Vue wrapper; real docs live at `/static/
 
 ### Project-aware version resolution (`src/manifest/`, `src/tools/`)
 Parse a project's build manifests and drive version-correct docs:
-- Parsers: Gradle Version Catalog (`libs.versions.toml`), `build.gradle(.kts)`
-  (best-effort), Flutter `pubspec.yaml` → normalized `coordinate → version` tagged by
-  ecosystem (`maven` / `gradle-plugin` / `pub`).
+- Parsers: Gradle Version Catalog (`libs.versions.toml`), `build.gradle(.kts)` +
+  `settings.gradle(.kts)` (best-effort), Flutter `pubspec.yaml` and `pubspec.lock`
+  (lock takes precedence for exact versions) → normalized `coordinate → version` tagged
+  by ecosystem (`maven` / `gradle-plugin` / `pub`).
 - `documentationUrl` maps each coordinate to its registry doc URL (javadoc.io /
   pub.dev / plugins.gradle.org), versioned for pinned versions.
 - Tools (interface-agnostic, reused by CLI + MCP):

@@ -44,8 +44,8 @@ docs-mcp-server search okhttp "connection pool timeout"
 
 Over MCP, the `resolve_project_deps` tool returns each dependency's `docUrl`, so an
 assistant can resolve → scrape → search version-correct documentation in one flow.
-Recognized manifests: Gradle version catalogs (`libs.versions.toml`), `build.gradle(.kts)`,
-and Flutter `pubspec.yaml`.
+Recognized manifests: Gradle version catalogs (`libs.versions.toml`),
+`build.gradle(.kts)` / `settings.gradle(.kts)`, and Flutter `pubspec.yaml` / `pubspec.lock`.
 
 ## ✨ Why Grounded Docs MCP Server?
 

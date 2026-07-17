@@ -58,7 +58,7 @@ declares" with grounded, version-correct citations — without the operator hand
 | 1 | Source-code intelligence (Kotlin/Java/Dart) | `src/splitter/treesitter/` | ✅ java + kotlin (dart: line-based, AST follow-up) |
 | 2 | Ecosystem package registries | `src/scraper/strategies/` | ✅ 5 host strategies + docUrl mapping |
 | 3 | API-doc pipelines (Javadoc/KDoc/Dartdoc) | `src/scraper/middleware/` | 🟡 chrome removal (real-HTML verified) |
-| 4 | Project-aware version resolution | `src/manifest/`, `src/tools/` | 🟡 parsers + resolve/scrape-project + search wiring |
+| 4 | Project-aware version resolution | `src/manifest/`, `src/tools/` | ✅ parsers + resolve/scrape-project + search wiring |
 | 5 | Search quality tuning for Android | `tests/search-eval/`, retriever | ⬜ |
 | 6 | Agent Skills & developer experience | `skills/`, docs, CLI ergonomics | ⬜ |
 | 7 | Distribution & pre-seeded indexes | Docker, release pipeline | ⬜ |
@@ -259,8 +259,9 @@ expose a new tool in `src/tools/` (inherited by CLI/MCP/Web).
   and Flutter `pubspec.yaml` (`yaml`), all pure and unit-tested, normalizing to a flat
   coordinate→version list tagged by ecosystem (`maven` / `gradle-plugin` / `pub`) and
   discovered recursively by `resolveProjectManifests`.
-  **Follow-up:** `settings.gradle(.kts)` and `pubspec.lock` (the latter needs
-  lock-over-yaml precedence when both exist in a module).
+  `settings.gradle(.kts)` is parsed with the same best-effort regex; `pubspec.lock`
+  provides exact resolved versions and takes precedence over `pubspec.yaml` in the same
+  module.
 - ✅ Tool `resolve-project-deps` — `ResolveProjectDepsTool` + `resolveProjectManifests`
   walk a project root, parse every recognized manifest, and emit the de-duplicated
   coordinate→version set. Store-free (filesystem only) so every interface reuses it.
