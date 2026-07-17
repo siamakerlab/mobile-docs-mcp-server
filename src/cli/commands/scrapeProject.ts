@@ -95,8 +95,12 @@ export function createScrapeProjectCommand(cli: Argv) {
 
         renderStructuredOutput(result, argv);
       } finally {
-        if (pipeline) await pipeline.stop();
-        await docService.shutdown();
+        // Ensure docService is always shut down even if stopping the pipeline throws.
+        try {
+          if (pipeline) await pipeline.stop();
+        } finally {
+          await docService.shutdown();
+        }
       }
     },
   );

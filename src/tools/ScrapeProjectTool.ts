@@ -84,6 +84,31 @@ export class ScrapeProjectTool {
           jobs.push({ coordinate: dep.coordinate, version, url, jobId: result.jobId });
         }
       } catch (error) {
+        // ScrapeTool only accepts semver-shaped versions; some pinned-but-non-semver
+        // versions (e.g. Guava's `31.1-jre`, Spring's `1.0.0.RELEASE`) are rejected even
+        // though documentationUrl built a valid versioned URL. Retry unversioned so the
+        // dependency is still indexed at that URL rather than dropped entirely.
+        if (version !== null) {
+          try {
+            const retry = await this.scrapeTool.execute({
+              library: dep.coordinate,
+              version: null,
+              url,
+              waitForCompletion: false,
+            });
+            if ("jobId" in retry) {
+              jobs.push({
+                coordinate: dep.coordinate,
+                version: null,
+                url,
+                jobId: retry.jobId,
+              });
+            }
+            continue;
+          } catch {
+            // fall through to skipped below
+          }
+        }
         skipped.push({
           coordinate: dep.coordinate,
           reason: error instanceof Error ? error.message : "failed to enqueue scrape job",

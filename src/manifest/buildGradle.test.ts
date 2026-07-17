@@ -72,4 +72,20 @@ dependencies {
       source: "app/build.gradle.kts",
     });
   });
+
+  it("does not match 'id' inside a larger identifier (word boundary)", () => {
+    const gradle = `android {
+    defaultConfig {
+        applicationId "com.evil.app"
+    }
+}
+some_id("com.example.evil") version "9.9.9"
+`;
+    const { dependencies } = parseBuildGradle(gradle);
+    const coords = dependencies.map((d) => d.coordinate);
+    // applicationId (no trailing \`version\`) and some_id (\`id\` preceded by a word char)
+    // must not be mis-parsed as plugin ids.
+    expect(coords).not.toContain("com.evil.app");
+    expect(coords).not.toContain("com.example.evil");
+  });
 });

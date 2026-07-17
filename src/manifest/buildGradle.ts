@@ -14,8 +14,9 @@ import type { ManifestParseResult, ResolvedDependency } from "./types";
 /** `"group:artifact:version"` or `'group:artifact:version'` in a dependency string. */
 const COORDINATE_RE = /["']([A-Za-z][\w.-]*):([\w.-]+):([\w.+-]+)["']/g;
 
-/** `id("plugin.id") version "1.2.3"` (Kotlin DSL) or the Groovy equivalent. */
-const PLUGIN_RE = /id\s*\(?\s*["']([\w.-]+)["']\s*\)?\s*version\s+["']([\w.+-]+)["']/g;
+/** `id("plugin.id") version "1.2.3"` (Kotlin DSL) or the Groovy equivalent. The leading
+ * `\b` prevents matching `id` inside a larger identifier (e.g. `applicationId`). */
+const PLUGIN_RE = /\bid\s*\(?\s*["']([\w.-]+)["']\s*\)?\s*version\s+["']([\w.+-]+)["']/g;
 
 /**
  * Parse a Gradle build script into normalized dependencies (best-effort).

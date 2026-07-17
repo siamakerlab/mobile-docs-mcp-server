@@ -73,4 +73,30 @@ describe("documentationUrl", () => {
       "https://javadoc.io/doc/g/a",
     );
   });
+
+  it("keeps Maven qualifier versions pinned (Guava-style 31.1-jre)", () => {
+    expect(
+      documentationUrl(
+        dep({
+          ecosystem: "maven",
+          coordinate: "com.google.guava:guava",
+          version: "31.1-jre",
+        }),
+      ),
+    ).toBe("https://javadoc.io/static/com.google.guava/guava/31.1-jre/index.html");
+  });
+
+  it("treats pub build-metadata (1.2.3+4) as pinned and encodes the '+'", () => {
+    expect(
+      documentationUrl(dep({ ecosystem: "pub", coordinate: "foo", version: "1.2.3+4" })),
+    ).toBe("https://pub.dev/packages/foo/versions/1.2.3%2B4");
+  });
+
+  it("encodes path segments to prevent traversal from malformed coordinates", () => {
+    expect(
+      documentationUrl(
+        dep({ ecosystem: "maven", coordinate: "a/../b:artifact", version: "1.0.0" }),
+      ),
+    ).toBe("https://javadoc.io/static/a%2F..%2Fb/artifact/1.0.0/index.html");
+  });
 });

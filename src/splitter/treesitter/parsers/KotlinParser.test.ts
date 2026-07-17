@@ -174,6 +174,27 @@ fun another(): Int = 2
       expect(fns).not.toContain("inner");
     });
 
+    it("does not let a wildcard import boundary swallow the next declaration's KDoc", () => {
+      const code = `import androidx.compose.material3.*
+
+/** Repository doc. */
+interface Repo {
+    fun load()
+}
+`;
+      const result = parser.parse(code);
+      const boundaries = parser.extractBoundaries(result.tree, code);
+
+      const imp = boundaries.find((b) => b.type === "module");
+      expect(imp).toBeDefined();
+      const impContent = code
+        .split("\n")
+        .slice(imp!.startLine - 1, imp!.endLine)
+        .join("\n");
+      // The import chunk must not swallow the following declaration's KDoc.
+      expect(impContent).not.toContain("Repository doc");
+    });
+
     it("should handle empty content", () => {
       const result = parser.parse("");
       const boundaries = parser.extractBoundaries(result.tree, "");

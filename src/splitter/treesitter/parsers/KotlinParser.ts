@@ -353,14 +353,32 @@ export class KotlinParser implements LanguageParser {
         const docInfo = findDocumentationStart(node, source);
         const classification = classifyBoundaryKind(node, source);
 
+        // The fwcd Kotlin grammar can attach a *following* declaration's comment as a
+        // trailing child of `import_header` (e.g. `import a.b.*` then a KDoc before the
+        // next class). Exclude trailing comments from the import boundary's end so the
+        // KDoc isn't swallowed into the import chunk instead of the class it documents.
+        let endByte = node.endIndex;
+        let endLine = node.endPosition.row + 1;
+        if (node.type === "import_header") {
+          for (let i = node.children.length - 1; i >= 0; i--) {
+            const child = node.children[i];
+            if (COMMENT_TYPES.has(child.type)) {
+              continue;
+            }
+            endByte = child.endIndex;
+            endLine = child.endPosition.row + 1;
+            break;
+          }
+        }
+
         boundaries.push({
           type: classification.simple,
           boundaryType: classification.boundaryType,
           name,
           startLine: docInfo.startLine,
-          endLine: node.endPosition.row + 1,
+          endLine,
           startByte: docInfo.startByte,
-          endByte: node.endIndex,
+          endByte,
         });
 
         for (const c of node.children) walk(c);

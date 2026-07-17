@@ -83,6 +83,25 @@ dependencies {
     expect(skipped).toEqual([]);
   });
 
+  it("retries unversioned when ScrapeTool rejects a pinned non-semver version", async () => {
+    // Guava's 31.1-jre is a valid pinned Maven version (documentationUrl builds a
+    // versioned URL) but ScrapeTool's semver check rejects it. It must be indexed
+    // unversioned rather than dropped.
+    await fsPromises.writeFile(
+      path.join(root, "build.gradle.kts"),
+      'dependencies {\n    implementation("com.google.guava:guava:31.1-jre")\n}\n',
+    );
+
+    const { jobs, skipped } = await tool.execute({ path: root });
+    const guava = jobs.find((j) => j.coordinate === "com.google.guava:guava");
+
+    expect(guava).toMatchObject({
+      version: null,
+      url: "https://javadoc.io/static/com.google.guava/guava/31.1-jre/index.html",
+    });
+    expect(skipped).toEqual([]);
+  });
+
   it("returns empty jobs for an empty project", async () => {
     const { jobs, skipped, warnings } = await tool.execute({ path: root });
     expect(jobs).toEqual([]);
