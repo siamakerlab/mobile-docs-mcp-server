@@ -1,3 +1,6 @@
+import fsPromises from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 import {
   type DocumentManagementService,
@@ -46,6 +49,32 @@ describe("SearchTool", () => {
   ];
 
   // --- Search Logic & Version Resolution Tests ---
+
+  it("defaults to the project-declared version when projectPath is given", async () => {
+    const root = await fsPromises.mkdtemp(path.join(os.tmpdir(), "searchtool-proj-"));
+    try {
+      await fsPromises.writeFile(
+        path.join(root, "build.gradle.kts"),
+        'dependencies {\n    implementation("com.squareup.okhttp3:okhttp:4.12.0")\n}\n',
+      );
+      (mockDocService.findBestVersion as Mock).mockResolvedValue({
+        bestMatch: "4.12.0",
+        hasUnversioned: false,
+      });
+      (mockDocService.searchStore as Mock).mockResolvedValue(mockSearchResults);
+
+      await searchTool.execute({
+        library: "okhttp",
+        query: "connection pool",
+        projectPath: root,
+      });
+
+      // The Maven artifact name "okhttp" resolves to the project-pinned 4.12.0.
+      expect(mockDocService.findBestVersion).toHaveBeenCalledWith("okhttp", "4.12.0");
+    } finally {
+      await fsPromises.rm(root, { recursive: true, force: true });
+    }
+  });
 
   it("should search with exact version when exactMatch is true", async () => {
     const options: SearchToolOptions = {

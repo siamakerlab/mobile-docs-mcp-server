@@ -200,13 +200,20 @@ export function createMcpServerInstance(
         .describe("Library version (exact or X-Range, optional)."),
       query: z.string().trim().describe("Documentation search query."),
       limit: z.number().optional().default(5).describe("Maximum number of results."),
+      projectPath: z
+        .string()
+        .trim()
+        .optional()
+        .describe(
+          "Path to a project root. When no version is given, defaults to the version the project declares for the library (from its Gradle/pubspec manifests).",
+        ),
     },
     {
       title: "Search Library Documentation",
       readOnlyHint: true,
       destructiveHint: false,
     },
-    async ({ library, version, query, limit }) => {
+    async ({ library, version, query, limit, projectPath }) => {
       // Track MCP tool usage
       telemetry.track(TelemetryEvent.TOOL_USED, {
         tool: "search_docs",
@@ -224,6 +231,7 @@ export function createMcpServerInstance(
           query,
           limit,
           exactMatch: false, // Always false for MCP interface
+          projectPath,
         });
 
         const formattedResults = result.results.map(

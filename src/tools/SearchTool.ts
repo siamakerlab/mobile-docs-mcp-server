@@ -1,3 +1,4 @@
+import { projectVersionForLibrary, resolveProjectManifests } from "../manifest";
 import { VersionNotFoundInStoreError } from "../store";
 import type { IDocumentManagement } from "../store/trpc/interfaces";
 import type { StoreSearchResult } from "../store/types";
@@ -10,6 +11,12 @@ export interface SearchToolOptions {
   query: string;
   limit?: number;
   exactMatch?: boolean;
+  /**
+   * Optional path to a project root. When set and no explicit `version` is given,
+   * the search defaults to the concrete version this project declares for `library`
+   * (from its build manifests), so results match the version the project uses.
+   */
+  projectPath?: string;
 }
 
 export interface SearchToolResultError {
@@ -40,7 +47,8 @@ export class SearchTool {
   }
 
   async execute(options: SearchToolOptions): Promise<SearchToolResult> {
-    const { library, version, query, limit = 5, exactMatch = false } = options;
+    const { library, query, limit = 5, exactMatch = false, projectPath } = options;
+    let version = options.version;
 
     // Validate required inputs
     if (!library || typeof library !== "string" || library.trim() === "") {
@@ -62,6 +70,17 @@ export class SearchTool {
         "Limit must be a number between 1 and 100.",
         this.constructor.name,
       );
+    }
+
+    // Project-aware version default: when no explicit version is given, use the
+    // concrete version the project declares for this library, if any.
+    if (!version && projectPath) {
+      const { dependencies } = await resolveProjectManifests(projectPath);
+      const projectVersion = projectVersionForLibrary(dependencies, library);
+      if (projectVersion) {
+        version = projectVersion;
+        logger.info(`📦 Using project-declared version ${library}@${version}`);
+      }
     }
 
     // When exactMatch is true, version must be specified and not 'latest'

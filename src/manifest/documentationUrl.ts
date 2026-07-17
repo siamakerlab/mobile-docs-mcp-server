@@ -15,9 +15,11 @@
 import type { ResolvedDependency } from "./types";
 
 /**
- * Whether a declared version is a concrete, path-safe pin (not a range/constraint).
+ * Return the version if it is a concrete, path-safe pin (not a range/constraint),
+ * otherwise `null`. Used both for building versioned doc URLs and for choosing a
+ * project-declared version to search against.
  */
-function pinnedVersion(version: string | null): string | null {
+export function pinnedVersion(version: string | null): string | null {
   if (version === null) {
     return null;
   }

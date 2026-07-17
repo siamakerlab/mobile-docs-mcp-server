@@ -44,6 +44,12 @@ export function createSearchCommand(cli: Argv) {
           default: false,
           alias: ["e", "exactMatch"],
         })
+        .option("project", {
+          type: "string",
+          description:
+            "Path to a project root; when no --version is given, defaults to the version the project declares for <library>",
+          alias: "projectPath",
+        })
         .option("embedding-model", {
           type: "string",
           description:
@@ -104,6 +110,7 @@ export function createSearchCommand(cli: Argv) {
           query,
           limit,
           exactMatch: argv.exactMatch as boolean,
+          projectPath: argv.project as string | undefined,
         });
 
         renderStructuredOutput(result.results, argv);
