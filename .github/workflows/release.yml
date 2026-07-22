@@ -38,7 +38,14 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: npm ci
+        # NOTE: `npm install`, not `npm ci`. The dependency tree carries a pre-existing
+        # nested-version drift (e.g. conventional-commits-filter 5.x vs 6.x, @emnapi/*
+        # bundled optional deps) that npm cannot express in a lockfile it will accept
+        # under the stricter `npm ci` — npm itself rejects the lockfile it generates via
+        # `npm install`. `npm install` resolves the tree correctly (exit 0). The manual
+        # release path below does not use semantic-release/conventional tooling, so this
+        # has no effect on publishing behavior.
+        run: npm install --no-audit --no-fund
 
       - name: Determine release mode
         id: release-mode
