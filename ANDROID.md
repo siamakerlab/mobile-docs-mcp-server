@@ -45,7 +45,7 @@ Parse a project's build manifests and drive version-correct docs:
 ## Upstream sync policy
 
 - `upstream` remote points at `https://github.com/arabold/docs-mcp-server.git`;
-  `origin` is the personal fork `siamakerlab/android-docs-mcp-server`.
+  `origin` is the personal fork `siamakerlab/mobile-docs-mcp-server`.
 - Merge upstream periodically. Conflict-prone files are the ones this fork edits in
   place rather than extends: `src/scraper/ScraperRegistry.ts`,
   `src/splitter/treesitter/LanguageParserRegistry.ts`, `src/utils/mimeTypeUtils.ts`,
@@ -62,11 +62,11 @@ release. Record the upstream base commit in `CHANGELOG.md` on each sync.
 
 ## Distribution
 
-Published to npm as **`@siamakerlab/android-docs-mcp-server`** (renamed off upstream's
-`@arabold/docs-mcp-server`; `bin` kept as `docs-mcp-server`). Install with
-`npx @siamakerlab/android-docs-mcp-server` or `npm install -g`. Versioned on the
-independent 0.x line (starting `0.1.1`). Attribution to the original authors stays in
-`README.md` / `LICENSE`.
+Published to npm as **`mobile-docs-mcp`** (unscoped; renamed off upstream's
+`@arabold/docs-mcp-server` and this fork's earlier `@siamakerlab/android-docs-mcp-server`
+name; `bin` kept as `docs-mcp-server`). Install with `npx mobile-docs-mcp` or
+`npm install -g mobile-docs-mcp`. Versioned on the independent 0.x line. Attribution to
+the original authors stays in `README.md` / `LICENSE`.
 
 **Node 22 only** — `better-sqlite3` and the tree-sitter grammars ship Node-ABI-pinned
 binaries. The current dev environment runs Node 24; grammar/DB loading was validated

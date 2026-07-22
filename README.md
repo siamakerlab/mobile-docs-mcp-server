@@ -6,33 +6,40 @@
 
 ![Docs MCP Server Web Interface](docs/docs-mcp-server.png)
 
-## 🤖 About This Fork — Android-First
+## 🤖 About This Fork — Mobile-First (Android + iOS)
 
-This fork adapts Grounded Docs into a documentation companion purpose-built for **Android and mobile app development**. Upstream is an outstanding general-purpose documentation indexer; our goal is to refine and extend it so it excels specifically at the sources, formats, and workflows an Android developer reaches for every day.
+This fork adapts Grounded Docs into a documentation companion purpose-built for **mobile app development**. Upstream is an outstanding general-purpose documentation indexer; this fork refines and extends it so it excels at the sources, formats, and workflows a mobile engineer reaches for every day — across two additive tracks.
 
-**Focus ecosystems:**
+**Android / JVM / Flutter — available today:**
 
 -   **Kotlin** — language reference, coroutines, Jetpack, Kotlin Multiplatform.
 -   **Java** — JVM APIs and Android's Java interop surface.
 -   **Flutter / Dart** — framework documentation and pub.dev package references.
 -   **Gradle** — the build system, Android Gradle Plugin, and plugin DSL.
 
-**Ultimate goal:** keep the powerful indexing and hybrid semantic-search core intact while tuning ingestion, formatting, and defaults toward the Android / JVM / Flutter documentation an AI coding assistant needs to stay accurate and version-aware. Everything here is a set of incremental modifications and improvements layered on top of upstream — full credit for the original design and implementation belongs to the [original authors](https://github.com/arabold/docs-mcp-server).
+**iOS / Apple — on the roadmap:**
 
-See the **[ROADMAP](ROADMAP.md)** for the detailed, phased plan to get there.
+-   **Swift / Objective-C** — language and framework source (SwiftUI, UIKit, Foundation).
+-   **DocC** — Apple's documentation format, served as directly fetchable render JSON by developer.apple.com, docs.swift.org, and Swift Package Index.
+-   **Swift Package Manager / CocoaPods / Carthage** — dependency coordinates and exact-version resolution.
 
-### Android workflow (fork-specific)
+**Ultimate goal:** keep the powerful indexing and hybrid semantic-search core intact while tuning ingestion, formatting, and defaults toward the mobile documentation an AI coding assistant needs to stay accurate and version-aware. The **Android track has largely landed**; the **iOS track is planned** (Phases i1–i7). Everything here layers additively on top of upstream — full credit for the original design and implementation belongs to the [original authors](https://github.com/arabold/docs-mcp-server).
+
+See the **[ROADMAP](ROADMAP.md)** for the detailed, phased plan across both tracks.
+
+### Mobile project workflow (fork-specific)
 
 These commands use features this fork adds on top of upstream (the
-`resolve-project-deps` / `scrape-project` commands and Kotlin/Java AST chunking).
-It's published to npm (requires **Node.js 22+**):
+`resolve-project-deps` / `scrape-project` commands and Kotlin/Java AST chunking). Today
+they cover Android/Flutter projects; iOS/SPM support is on the roadmap. Published to npm
+(requires **Node.js 22+**):
 
 ```bash
 # Run on demand with npx …
-npx @siamakerlab/android-docs-mcp-server <command> [args]
+npx mobile-docs-mcp <command> [args]
 
 # … or install globally to get the `docs-mcp-server` command used below.
-npm install -g @siamakerlab/android-docs-mcp-server
+npm install -g mobile-docs-mcp
 ```
 
 Add it to an MCP client (Claude Desktop / Claude Code). Set `OPENAI_API_KEY` (or
@@ -41,15 +48,15 @@ another embedding provider) in `env` for semantic search:
 ```json
 {
   "mcpServers": {
-    "android-docs": {
+    "mobile-docs": {
       "command": "npx",
-      "args": ["-y", "@siamakerlab/android-docs-mcp-server", "--protocol", "stdio"]
+      "args": ["-y", "mobile-docs-mcp", "--protocol", "stdio"]
     }
   }
 }
 ```
 
-Then, from the CLI:
+Then, from the CLI (Android / Flutter example):
 
 ```bash
 # 1. See exactly what your project depends on — each result carries a docUrl
@@ -68,8 +75,9 @@ docs-mcp-server search okhttp "connection pool timeout"
 
 Over MCP, the `resolve_project_deps` tool returns each dependency's `docUrl`, so an
 assistant can resolve → scrape → search version-correct documentation in one flow.
-Recognized manifests: Gradle version catalogs (`libs.versions.toml`),
+Recognized manifests today: Gradle version catalogs (`libs.versions.toml`),
 `build.gradle(.kts)` / `settings.gradle(.kts)`, and Flutter `pubspec.yaml` / `pubspec.lock`.
+Planned for iOS: `Package.resolved`, `Podfile.lock`, `Cartfile.resolved`.
 
 ## ✨ Why Grounded Docs MCP Server?
 
@@ -110,7 +118,7 @@ For agents and scripts, the CLI is usually the simplest way to use Grounded Docs
 **1. Index documentation** (requires Node.js 22+):
 
 ```bash
-npx @siamakerlab/android-docs-mcp-server@latest scrape kotlin https://kotlinlang.org/docs/
+npx mobile-docs-mcp@latest scrape kotlin https://kotlinlang.org/docs/
 ```
 
 > Tip: for `scope=subpages` (the default), prefer a directory URL ending in `/`
@@ -120,19 +128,19 @@ npx @siamakerlab/android-docs-mcp-server@latest scrape kotlin https://kotlinlang
 For hash-routed SPA docs sites, enable hash preservation explicitly:
 
 ```bash
-npx @siamakerlab/android-docs-mcp-server@latest scrape my-spa https://docs.example.com/#/guide --preserve-hashes
+npx mobile-docs-mcp@latest scrape my-spa https://docs.example.com/#/guide --preserve-hashes
 ```
 
 **2. Query the index:**
 
 ```bash
-npx @siamakerlab/android-docs-mcp-server@latest search kotlin "coroutine scope builder" --output yaml
+npx mobile-docs-mcp@latest search kotlin "coroutine scope builder" --output yaml
 ```
 
 **3. Fetch a single page as Markdown:**
 
 ```bash
-npx @siamakerlab/android-docs-mcp-server@latest fetch-url https://kotlinlang.org/docs/coroutines-basics.html
+npx mobile-docs-mcp@latest fetch-url https://kotlinlang.org/docs/coroutines-basics.html
 ```
 
 ### Output Behavior
@@ -154,7 +162,7 @@ If you want a long-running MCP endpoint for Claude, Cline, Copilot, Gemini CLI, 
 **1. Start the server:**
 
 ```bash
-npx @siamakerlab/android-docs-mcp-server@latest
+npx mobile-docs-mcp@latest
 ```
 
 **2. Open the Web UI** at **[http://localhost:6280](http://localhost:6280)** to add documentation.
@@ -164,7 +172,7 @@ npx @siamakerlab/android-docs-mcp-server@latest
 ```json
 {
   "mcpServers": {
-    "android-docs": {
+    "mobile-docs": {
       "type": "sse",
       "url": "http://localhost:6280/sse"
     }
@@ -185,7 +193,7 @@ docker run --rm \
   -v docs-mcp-data:/data \
   -v docs-mcp-config:/config \
   -p 6280:6280 \
-  ghcr.io/siamakerlab/android-docs-mcp-server:latest \
+  ghcr.io/siamakerlab/mobile-docs-mcp-server:latest \
   --protocol http --host 0.0.0.0 --port 6280
 ```
 
@@ -198,7 +206,7 @@ Using an embedding model is **optional** but dramatically improves search qualit
 **Example: Enable OpenAI Embeddings**
 
 ```bash
-OPENAI_API_KEY="sk-proj-..." npx @siamakerlab/android-docs-mcp-server@latest
+OPENAI_API_KEY="sk-proj-..." npx mobile-docs-mcp@latest
 ```
 
 See **[Embedding Models](docs/guides/embedding-models.md)** for configuring **Ollama**, **Gemini**, **Azure**, and others.

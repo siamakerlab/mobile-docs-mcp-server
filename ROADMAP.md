@@ -1,10 +1,17 @@
-# ROADMAP — Android-First Grounded Docs
+# ROADMAP — Mobile-First Grounded Docs (Android + iOS)
 
 This roadmap tracks the work required to evolve this fork of
 [`arabold/docs-mcp-server`](https://github.com/arabold/docs-mcp-server) into a
-documentation-grounding MCP server **specialized for Android and mobile app
-development**, with first-class focus on the **Kotlin, Java, Flutter/Dart, and
-Gradle** ecosystems.
+documentation-grounding MCP server **specialized for mobile app development**,
+across two first-class, additive tracks:
+
+- **Part I — Android** (Phases 0–7): the **Kotlin, Java, Flutter/Dart, and Gradle**
+  ecosystems. Largely landed.
+- **Part II — iOS / Apple** (Phases i1–i7): the **Swift, Objective-C, DocC, and Swift
+  Package Manager** ecosystems. Planned; applies the same extension pattern a second time.
+
+Both tracks share one indexing + hybrid-search core and one set of interface-agnostic
+tools, so every capability reaches CLI, MCP, and Web identically.
 
 It is a living document. Milestones are ordered by dependency, not by calendar
 date. Status markers: `⬜ planned` · `🟡 in progress` · `✅ done` · `❄️ deferred`.
@@ -26,6 +33,24 @@ Android/mobile engineer touches every day:
 **Success, stated plainly:** an AI coding assistant connected to this server can
 answer "how do I do X in Kotlin/AGP/Flutter, on the exact versions my project
 declares" with grounded, version-correct citations — without the operator hand-picking URLs.
+
+### iOS / Apple ecosystem (Part II — additive)
+
+The same core, re-pointed a second time at the Apple stack. Nothing here removes the
+Android or general-purpose sources; it adds a parallel track:
+
+- **Swift / Objective-C** — language and framework source (SwiftUI, UIKit, Foundation),
+  AST-chunked like Kotlin/Java.
+- **DocC** — Apple's documentation format. Crucially, `developer.apple.com`,
+  `docs.swift.org`, and Swift Package Index all serve it as a **directly fetchable
+  render-JSON API** (no headless browser, no HTML chrome to strip) — a structural
+  advantage over Android's Javadoc HTML.
+- **Swift Package Manager / CocoaPods / Carthage** — dependency coordinates and, via
+  their lock files, exact-version resolution.
+
+**Success, Apple flavor:** answer "how do I do X in Swift/SwiftUI/SPM, on the exact
+versions my `Package.resolved`/`Podfile.lock` pins" with grounded citations — the same
+promise as Android, a different ecosystem.
 
 ---
 
@@ -67,6 +92,14 @@ The **critical path** is Phase 1 → Phase 4: without Kotlin/Java/Dart chunking
 (1) and manifest-driven version detection (4), the Android value proposition is
 incomplete. Phases 2, 3, 5, 6, 7 can proceed in parallel once 1 lands.
 
+**iOS / Apple track (Part II).** A parallel, additive set of milestones (Phases i1–i7)
+applies the exact same extension pattern — new parser / new strategy / new manifest /
+new tool, never core edits — to Swift, Objective-C, DocC, and SPM. Its full table and
+critical path live in **§12**. Unlike Android, the iOS critical path is led by the
+**DocC render-JSON pipeline (i3)**: because Apple's docs expose clean JSON, that single
+strategy unlocks `developer.apple.com`, `docs.swift.org`, and Swift Package Index at
+once, and can land before Swift source chunking (i1).
+
 ---
 
 ## 4. Phase 0 — Fork Foundations & Sync Hygiene
@@ -79,9 +112,10 @@ incomplete. Phases 2, 3, 5, 6, 7 can proceed in parallel once 1 lands.
 - ✅ **Fork versioning decided** — SemVer with a fork-lineage pre-release suffix
   (`<upstream-base>-android.<n>`, e.g. `2.4.2-android.1`) while the API tracks upstream;
   switch to an independent line (`3.0.0`) once it diverges. Documented in `ANDROID.md`.
-- ✅ **Distributable identity** — published to npm as
-  `@siamakerlab/android-docs-mcp-server` (independent 0.x line, `0.1.1`, `latest`),
-  renamed off upstream's `@arabold/docs-mcp-server`; `bin` kept as `docs-mcp-server`.
+- ✅ **Distributable identity** — published to npm as the unscoped **`mobile-docs-mcp`**
+  (independent 0.x line, `latest`), renamed off upstream's `@arabold/docs-mcp-server`
+  and off this fork's earlier `@siamakerlab/android-docs-mcp-server` name; GitHub repo
+  `siamakerlab/mobile-docs-mcp-server`; `bin` kept as `docs-mcp-server`.
 - ✅ **`ANDROID.md`** describing the Android-specific subsystems, sync, and versioning.
 - ➡️ Android retrieval **benchmark baseline** — moved to Phase 5 (`tests/search-eval/`),
   where the search-quality work lives.
@@ -360,7 +394,255 @@ and (optionally) seeded docs, validated by the Docker E2E suite.
 
 ---
 
-## 12. Cross-Cutting Concerns
+## 12. iOS / Apple Track — Overview
+
+Part II re-applies the Android track's proven extension pattern to the Apple ecosystem:
+**Swift, Objective-C, SwiftUI/UIKit, Swift Package Manager, and DocC**. Every milestone
+honors the same Design Principles (§2) — additive extension points, business logic in
+`src/tools/`, Node 22 + native-ABI discipline, behavior-driven co-located tests,
+version-awareness.
+
+**iOS milestone overview**
+
+| Phase | Theme | Primary code surface | Status |
+|------|-------|----------------------|--------|
+| i1 | Source-code intelligence (Swift / Obj-C) | `src/splitter/treesitter/parsers/` | ⬜ planned |
+| i2 | Apple ecosystem registries | `src/scraper/strategies/` | ⬜ planned |
+| i3 | DocC render-JSON pipeline | `src/scraper/` (new JSON-native pipeline) | ⬜ planned |
+| i4 | iOS project-aware version resolution | `src/manifest/`, `src/tools/` | ⬜ planned |
+| i5 | Search quality tuning for iOS | `tests/search-eval/` | ⬜ planned |
+| i6 | iOS agent skills & DX | `skills/`, docs | ⬜ planned |
+| i7 | Distribution (Swift grammar in Docker) | Docker, release pipeline | ⬜ planned |
+
+**Critical path — different from Android.** Apple's docs (and every DocC-based site)
+expose a clean, unauthenticated **render-JSON API**, so the highest-leverage move is the
+**DocC pipeline (i3)**, not source chunking. i3 → i4 is the spine: JSON extraction plus
+manifest-driven version resolution delivers most of the iOS value. i1 (Swift AST
+chunking) raises quality for indexed *source*, and i2 recognizes the hosts, but a useful
+iOS server exists as soon as i3 + i4 land. i5/i6/i7 parallelize after i3.
+
+**What carries over for free.** The tools layer is already interface-agnostic and
+ecosystem-tagged, so `resolve-project-deps`, `scrape-project`, and `search --project`
+extend to SPM/CocoaPods by adding parsers + `documentationUrl` mappings — no new tool
+surface, no interface edits. Likewise `ScraperRegistry` and `LanguageParserRegistry`
+take new entries additively.
+
+---
+
+## 13. Phase i1 — Source-Code Intelligence: Swift / Objective-C
+
+**Goal:** AST-aware, symbol-aligned chunking of `.swift` (and, if adopted, `.h`/`.m`/`.mm`)
+source, so indexed Apple code splits on real boundaries — types, functions, doc comments,
+`// MARK:` — instead of line windows. Direct analogue of Android Phase 1.
+
+**Code surface & pattern:** identical to Android — implement `LanguageParser`
+(templates: `KotlinParser.ts`, `JavaParser.ts`) under
+`src/splitter/treesitter/parsers/`, register in `LanguageParserRegistry.ts`, and route
+extensions/MIME in `src/utils/mimeTypeUtils.ts` + `SourceCodePipeline`.
+
+**Grammar decision (2026-07 research — re-confirm on Node 22 before adopting).** The core
+is pinned at `tree-sitter ^0.21.1` and cannot cheaply move (`better-sqlite3` + existing
+grammars are Node-ABI-pinned). This forces the same "pin an older grammar release" tactic
+Android used for Kotlin:
+- **Swift** — `tree-sitter-swift` (alex-pinkus). Latest `0.7.x` requires core `^0.22.1`
+  — **incompatible**. **Pin `tree-sitter-swift@0.6.0`**, which declares peer
+  `tree-sitter ^0.21.1` and ships N-API prebuilds (loads without compiling). Trade-off:
+  `0.6.0` lags the newest Swift 6 macro syntax; revisit on a scheduled core `^0.22`
+  upgrade (shared gate with the Kotlin grammars-org migration noted in Phase 1).
+- **Objective-C** — `tree-sitter-objc` (tree-sitter-grammars). `3.0.1+` needs core
+  `^0.22.1`; **`3.0.0` declares no tree-sitter peer** — the candidate for core 0.21,
+  subject to runtime ABI validation. It pulls in a **second** native grammar
+  (`tree-sitter-c ^0.23.4`); both must build on Node 22 and survive `npm rebuild`.
+
+**Tasks**
+- ⬜ **SwiftParser** — classes, structs, enums, protocols, extensions, functions/methods,
+  initializers, computed/stored properties, `///` + `/** */` doc comments, `// MARK:`
+  boundaries. Fixtures + unit + a `vector-search-e2e` case that indexes a Swift file and
+  retrieves a symbol.
+- ⬜ **ObjCParser or defer** — `@interface`/`@implementation`/`@protocol`, methods,
+  properties. If `tree-sitter-objc@3.0.0` won't load on core 0.21, ship a **line-based
+  fallback** (content-preserving, `logger.debug`-logged, regression-tested) exactly like
+  Dart — don't block the track on it. Obj-C is lower priority than Swift.
+- ⬜ Extend `languageTypes.ts` / extension + MIME maps (`.swift` → `text/x-swift`;
+  `.h`/`.m`/`.mm` routing, with a heuristic for the ambiguous `.h`); add both to
+  `docs/concepts/supported-formats.md`.
+- ⬜ Spike doc `docs/spikes/ios-treesitter-grammars.md` recording the Node 22 load test,
+  mirroring `docs/spikes/phase1-treesitter-grammars.md`.
+
+**Risks:** the same core-version conflict that shaped Android Phase 1; ambiguous `.h`
+headers (C / C++ / Obj-C); Obj-C's transitive `tree-sitter-c` grammar; grammar staleness
+vs. newest Swift syntax.
+
+**Done when:** indexing a Swift file yields symbol- and doc-aligned chunks, verified by
+tests, with a measurable retrieval improvement over the line-based baseline.
+
+---
+
+## 14. Phase i2 — Apple Ecosystem Registries
+
+**Goal:** recognize the Apple/Swift documentation hosts so `scrape` accepts an Apple docs
+URL or a Swift package coordinate. Model on `AndroidDevDocsScraperStrategy`,
+`JavadocScraperStrategy`, `PubDevScraperStrategy`; register in `ScraperRegistry.ts`.
+
+**Tasks**
+- ⬜ **AppleDeveloperDocsStrategy** — `developer.apple.com/documentation/…`. Recognizes
+  the host and rewrites each page to its render-JSON twin (handed to the i3 pipeline). The
+  Apple analogue of `AndroidDevDocsScraperStrategy`.
+- ⬜ **SwiftPackageIndexStrategy** — `swiftpackageindex.com/{owner}/{repo}/{version}/documentation/{target}`.
+  This is Swift's **javadoc.io / pub.dev equivalent** (auto-generated, auto-hosted,
+  versioned DocC for SPM packages), so it anchors the package-coordinate → doc-URL mapping
+  in i4. **Gotcha: Cloudflare-protected** (naive fetch → HTTP 403) even though the JSON is
+  static — needs browser-grade headers or the Playwright path. See §22 open question.
+- ⬜ **SwiftOrgDocsStrategy** — `docs.swift.org/swift-book/…` (The Swift Programming
+  Language + stdlib, DocC) and `swift.org/documentation/`.
+- ⬜ **CocoaPods = metadata/version only.** CocoaDocs was sunset; `cocoapods.org` hosts no
+  API-doc content. Map a pod coordinate → Swift Package Index or the podspec's
+  `documentation_url`, never to a cocoapods.org doc page.
+
+**Done when:** `scrape` accepts an Apple docs URL or a Swift package coordinate and
+indexes the correct versioned documentation.
+
+---
+
+## 15. Phase i3 — DocC Render-JSON Pipeline (highest-leverage)
+
+**Goal:** extract clean, high-signal content from **DocC render JSON** — the one format
+that Apple's site, `docs.swift.org`, Swift Package Index, and every self-hosted
+`.doccarchive` all serve. This is the iOS track's keystone.
+
+**Why it leads the track.** `developer.apple.com` is a `swift-docc-render` Vue SPA with
+no content in the HTML — but the render JSON is directly fetchable, unauthenticated, and
+needs no browser:
+- Apple: `https://developer.apple.com/tutorials/data/documentation/<framework>/<symbol>.json`
+- Swift book: `https://docs.swift.org/swift-book/data/documentation/….json`
+- SPI: `https://swiftpackageindex.com/{o}/{r}/{v}/data/documentation/{target}.json`
+
+Map JSON URL → human URL by dropping the `/tutorials/data/` (or `/data/`) segment and the
+`.json` suffix. The JSON's `references` map is the **crawl frontier** — the full symbol
+link graph, enumerable without rendering a single page.
+
+**Code surface:** a **new JSON-native pipeline** under `src/scraper/`, parallel to
+`HtmlPipeline` — it consumes DocC JSON directly rather than HTML→Markdown. Prefer this over
+any headless-browser path for Apple / docs.swift.org. (Unlike Android Phase 3, there is
+**no generator chrome to strip** — the JSON is already structured.)
+
+**Tasks**
+- ⬜ **DocC JSON fetcher + detection** — detect DocC hosts, fetch the
+  `data/documentation/*.json` twin of a requested page, and walk `references` as the crawl
+  frontier.
+- ⬜ **DocC JSON → Markdown renderer** — flatten `abstract`; `primaryContentSections`
+  (`declarations` `tokens` → a code fence preserving full signatures; prose `content`);
+  `topicSections`; `relationshipsSections` (Conforms To / Inherited By); `seeAlsoSections`.
+  Preserve fully-qualified symbol names so search matches `Type.method(_:)`.
+- ⬜ Handle `schemaVersion` variance and the **Swift / Objective-C `variants`** split
+  (index the language the user targets; don't collapse both into noise).
+- ⬜ Fixtures from **real render JSON** (SwiftUI `View`, a TSPL page, one SPI package) +
+  unit tests; live coverage as a sibling of `test/html-pipeline-live-e2e.test.ts`.
+
+**Done when:** an indexed DocC page yields Markdown whose signatures and descriptions
+survive intact, verified against JSON fixtures, with **no** headless-browser dependency
+for Apple / docs.swift.org.
+
+---
+
+## 16. Phase i4 — iOS Project-Aware Version Resolution
+
+**Goal:** target the exact versions an iOS project declares, mirroring Android's
+manifest → `resolve-project-deps` / `scrape-project` / `search --project` chain. Reuses
+`documentationUrl`, `ResolveProjectDepsTool`, `ScrapeProjectTool`, and `SearchTool`'s
+`projectPath` — all already interface-agnostic. New manifest parsers in `src/manifest/`,
+tagged with new ecosystems (`spm` / `cocoapods` / `carthage`).
+
+**Principle: trust lock files, not DSL manifests.** `Package.swift` (Swift) and `Podfile`
+(Ruby) are executable code carrying only loose ranges; exact pins live in the lock files.
+
+**Tasks**
+- ⬜ **`Package.resolved` parser** (JSON, exact versions) — handle all three schema
+  versions: **v1** (`object.pins[]` with `package` / `repositoryURL` / `state.version`),
+  **v2** (`pins[]` with `identity` / `location` / `state.version`), **v3** (v2 +
+  `originHash`). Branch on the top-level `version` field. Also read the Xcode-embedded copy
+  at `*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved`.
+- ⬜ **`Podfile.lock` parser** (YAML, exact versions) — the `PODS:` section, parenthesized
+  versions (`- Alamofire (5.9.1)`), with `DEPENDENCIES` for declared constraints.
+- ⬜ **`Cartfile.resolved` parser** — trivial line format `github "owner/repo" "5.9.1"`.
+- ⬜ **Best-effort loose parsers** for `Package.swift` (prefer `swift package dump-package`
+  JSON when a Swift toolchain is present; else regex the common `.package(url:from:)` forms
+  and **flag as unresolved**), `Podfile`, `Cartfile`, and `.pbxproj`
+  `XCRemoteSwiftPackageReference` (the `requirement` dict — ranges only, exact only when
+  `kind == exactVersion`). Report dynamic/branch/range entries as unresolved rather than
+  guessing — same policy as Gradle dynamic versions.
+- ⬜ **`documentationUrl` mapping** — SPM coordinate (git URL / identity) → Swift Package
+  Index `{owner}/{repo}/{version}/documentation/{target}`; CocoaPods pod → SPI or the
+  podspec's `documentation_url`.
+- ⬜ Extend `src/manifest/discovery.ts` to walk `.xcodeproj`/`.xcworkspace` and locate the
+  embedded `Package.resolved`.
+
+**Risks:** `Package.swift`/`Podfile` DSLs resist static parse; three incompatible
+`Package.resolved` schemas; `.pbxproj` is an old-style plist (convert via `plutil` or a
+library, never hand-parse); a package may vend multiple DocC targets (which module to map?).
+
+**Done when:** pointing the tool at a real SPM/CocoaPods/Xcode project yields a correct
+version map and version-scoped search results.
+
+---
+
+## 17. Phase i5 — Search Quality Tuning for iOS
+
+**Goal:** prove and improve retrieval quality on Apple corpora, not just general docs.
+Same surface as Android Phase 5 — `tests/search-eval/` and `DocumentRetrieverService.ts`.
+
+**Tasks**
+- ⬜ **iOS qrel dataset** `tests/search-eval/dataset.ios.yaml` — labelled queries across
+  Swift, SwiftUI, UIKit, Foundation, and SPM over all four intents (api-lookup /
+  conceptual / comparison / troubleshooting), same schema as the Android/upstream datasets.
+- ⬜ Tune RRF weights / FTS generation for Swift symbol-heavy queries (`@State`,
+  `some View`, `NavigationStack`, `URLSession.data(from:)`). Blocked on the Apple corpora
+  being indexed and the qrel dataset finalized.
+- ⬜ Confirm embedding-provider behavior on Swift/DocC text; fold recommendations into
+  `docs/guides/embedding-models.md`.
+
+**Done when:** `npm run evaluate:search` shows iOS-corpus metrics at or above a captured
+baseline, with regressions gating.
+
+---
+
+## 18. Phase i6 — iOS Agent Skills & Developer Experience
+
+**Goal:** make the iOS workflow turnkey, mirroring `skills/android-project-docs/`.
+
+**Tasks**
+- ⬜ **`skills/ios-project-docs/SKILL.md`** — the resolve → scrape-project →
+  search-with-`--project` flow plus Swift source indexing, in the SKILL.md format.
+- ⬜ Ready-made **scrape recipes** for the canonical Apple sources
+  (`developer.apple.com/documentation`, `docs.swift.org/swift-book`,
+  `swiftpackageindex.com`).
+- ⬜ MCP client setup examples for iOS tooling (Xcode + MCP-capable assistants).
+- ⬜ README "iOS workflow" section paralleling the existing Android one.
+
+**Done when:** a new user can go from "connect server" to "search my project's exact
+SwiftUI/SPM version" by following documented skills/recipes.
+
+---
+
+## 19. Phase i7 — Distribution: Swift Grammar in Docker
+
+**Goal:** ship the iOS track so Apple teams can adopt it in minutes.
+
+**Tasks**
+- ⬜ Docker image builds the **Swift** (and, if adopted, Obj-C + C) tree-sitter grammars on
+  Node 22 (`node:22-trixie-slim`); `docker-e2e` asserts the Swift grammar loads and parses
+  inside the production image — this also serves as the **Node 22 re-validation** for the
+  iOS grammars.
+- ⬜ Optional **pre-seeded index** for stable Apple core docs (Swift stdlib, SwiftUI) so
+  first-run search is useful without a long scrape.
+- ⬜ Release automation + changelog records the iOS deltas alongside the Android ones.
+
+**Done when:** `docker run …` yields a working server that parses Swift and scrapes DocC,
+validated by the Docker E2E suite.
+
+---
+
+## 20. Cross-Cutting Concerns
 
 - **Testing:** every parser/strategy/pipeline ships unit + fixture tests; add
   Android cases to the E2E suites listed in `AGENTS.md`. Keep unit tests <100ms.
@@ -373,18 +655,22 @@ and (optionally) seeded docs, validated by the Docker E2E suite.
 
 ---
 
-## 13. Explicit Non-Goals
+## 21. Explicit Non-Goals
 
-- Not building an Android IDE plugin, build tool, or linter — this indexes and
-  searches **documentation**.
+- Not building an Android or Xcode/iOS IDE plugin, build tool, or linter — this indexes
+  and searches **documentation**.
 - Not generating code or performing RAG answer-synthesis (retrieval only, matching
   upstream scope).
-- Not dropping upstream's general-purpose sources — Android focus is *additive*.
-- Not supporting iOS/Swift as a first-class target in this roadmap (possible later).
+- Not dropping upstream's general-purpose sources — the Android **and iOS** focus is
+  *additive*.
+- Not code-signing, provisioning, or driving `xcodebuild`/Gradle/`swift build` —
+  dependency *versions* are read from manifests and lock files, never built or resolved
+  by invoking the toolchain (the one allowed exception is optionally shelling out to
+  `swift package dump-package` to read `Package.swift`, when a toolchain is present).
 
 ---
 
-## 14. Open Questions
+## 22. Open Questions
 
 - Fork versioning: pre-release suffix vs. hard `3.0.0` line (Phase 0).
 - ~~Which Kotlin/Dart grammar has reliable prebuilds?~~ **Resolved (2026-07-17):**
@@ -395,6 +681,20 @@ and (optionally) seeded docs, validated by the Docker E2E suite.
 - Google Maven artifacts often lack a canonical hosted doc page — how to map
   coordinate → docs URL? (Phase 2 design.)
 - Distribution: is a published npm package needed, or is Docker-only sufficient?
+- **iOS — Swift grammar core version:** pin `tree-sitter-swift@0.6.0` on core `^0.21`
+  (available now, lags newest Swift 6 syntax), or schedule a core `^0.22` upgrade that
+  unlocks the latest Swift + Kotlin (grammars-org) grammars but ripples into the whole
+  native ABI stack (`better-sqlite3`, existing grammars)? (Phase i1.)
+- **iOS — Objective-C:** adopt `tree-sitter-objc@3.0.0` (+ transitive `tree-sitter-c`)
+  on core 0.21, or defer to a line-based fallback like Dart until a core upgrade? (Phase i1.)
+- **iOS — Swift Package Index Cloudflare:** the render JSON is static but the host returns
+  403 to naive fetches — browser-grade headers, or route it through the Playwright path?
+  (Phase i2.)
+- **iOS — multi-target packages:** when an SPM package vends several DocC targets, which
+  `{target}` does `documentationUrl` map a bare coordinate to? (Phase i4.)
+- **Distribution identity:** ✅ **Decided** — renamed to the mobile-neutral, unscoped
+  **`mobile-docs-mcp`** (npm), with GitHub repo `siamakerlab/mobile-docs-mcp-server`;
+  `bin` stays `docs-mcp-server` for upstream compatibility. (Phase i6/i7.)
 
 ---
 

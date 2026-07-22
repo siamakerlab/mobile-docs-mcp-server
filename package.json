@@ -1,7 +1,7 @@
 {
-  "name": "@siamakerlab/android-docs-mcp-server",
+  "name": "mobile-docs-mcp",
   "version": "0.1.2",
-  "description": "Android/Kotlin/Flutter-focused fork of the docs MCP server: index and search version-correct library documentation",
+  "description": "Mobile-focused fork of the docs MCP server: index and search version-correct docs for Android (Kotlin/Java/Flutter/Gradle) today, iOS (Swift/DocC/SPM) on the roadmap",
   "type": "module",
   "bin": {
     "docs-mcp-server": "dist/index.js"
@@ -10,7 +10,7 @@
   "author": "grounded.tools",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/siamakerlab/android-docs-mcp-server.git"
+    "url": "git+https://github.com/siamakerlab/mobile-docs-mcp-server.git"
   },
   "files": [
     "dist",
