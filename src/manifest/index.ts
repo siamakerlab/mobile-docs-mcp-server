@@ -7,6 +7,7 @@ export * from "./gitCoordinate";
 export * from "./gradleVersionCatalog";
 export * from "./packageResolved";
 export * from "./packageSwift";
+export * from "./pbxproj";
 export * from "./podfile";
 export * from "./podfileLock";
 export * from "./projectVersion";

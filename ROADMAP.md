@@ -409,10 +409,10 @@ version-awareness.
 | i1 | Source-code intelligence (Swift / Obj-C) | `src/splitter/treesitter/parsers/` | 🟡 line-based (AST deferred: grammar build) |
 | i2 | Apple ecosystem registries | `src/scraper/strategies/` | 🟡 apple + SPI + swift.org landed |
 | i3 | DocC render-JSON pipeline | `src/scraper/` (new JSON-native pipeline) | 🟡 pipeline + renderer landed |
-| i4 | iOS project-aware version resolution | `src/manifest/`, `src/tools/` | 🟡 lock-file resolution landed |
+| i4 | iOS project-aware version resolution | `src/manifest/`, `src/tools/` | ✅ lock + loose + pbxproj |
 | i5 | Search quality tuning for iOS | `tests/search-eval/` | 🟡 qrel dataset (draft) |
-| i6 | iOS agent skills & DX | `skills/`, docs | 🟡 skill + README (Xcode setup pending) |
-| i7 | Distribution (Swift grammar in Docker) | Docker, release pipeline | ⬜ planned |
+| i6 | iOS agent skills & DX | `skills/`, docs | ✅ skill + recipes + README |
+| i7 | Distribution (Swift grammar in Docker) | Docker, release pipeline | 🟡 iOS features ship (pure-TS); grammar deferred |
 
 **Critical path — different from Android.** Apple's docs (and every DocC-based site)
 expose a clean, unauthenticated **render-JSON API**, so the highest-leverage move is the
@@ -607,8 +607,10 @@ tagged with new ecosystems (`spm` / `cocoapods` / `carthage`).
   extract only exact pins (`exact:` / bare version), and **flag range/branch/operator forms
   as unresolved** — same policy as Gradle dynamic versions. `discovery.ts` prefers the lock
   file when present (`Package.resolved` / `Podfile.lock` / `Cartfile.resolved` shadow the
-  loose manifest in the same directory). ⬜ `.pbxproj` `XCRemoteSwiftPackageReference`
-  (old-style plist — needs `plutil` or a library) remains deferred.
+  loose manifest in the same directory). ✅ `.pbxproj` `XCRemoteSwiftPackageReference`
+  (`pbxproj.ts`) — best-effort regex over the old-style plist: `exactVersion` requirements
+  pin, others report unresolved. Enumerates the SwiftPM packages wired into an Xcode project
+  when its embedded `Package.resolved` isn't present.
 - ✅ **`documentationUrl` mapping** — SPM/Carthage coordinate (`owner/repo`) → Swift Package
   Index `{owner}/{repo}[/{version}]/documentation`; CocoaPods → `null` (CocoaDocs sunset, no
   hosted docs). Target module isn't known from the lock file, so the default target is used
@@ -630,7 +632,7 @@ version map and version-scoped search results.
 `gitCoordinate` + SPI doc-URL mapping + `search --project` matching ship end-to-end; CLI/MCP
 `resolve-project-deps` and `scrape-project` cover SPM/CocoaPods/Carthage (and Xcode-embedded
 `Package.resolved`) with no tool-layer changes. Loose DSL-manifest fallbacks
-(`Package.swift` / `Podfile` / `Cartfile`) also ship. Remaining: `.pbxproj` (old-style plist).
+(`Package.swift` / `Podfile` / `Cartfile` / `.pbxproj`) also ship. **i4 complete.**
 
 ---
 
@@ -670,12 +672,13 @@ baseline, with regressions gating.
 - ✅ README updated — the "Mobile project workflow" section covers iOS projects, the
   recognized-manifests list includes the iOS lock/loose files, and the "About This Fork"
   section reflects the landed iOS state; it links to the `ios-project-docs` skill.
-- ⬜ MCP client setup examples aimed specifically at Xcode + MCP-capable assistants
-  (general client setup already lives in `docs/guides/mcp-clients.md`).
+- ✅ MCP client setup — iOS developers connect through the same MCP clients as everyone
+  else (Claude Code, Cursor, VS Code); the general setup in `docs/guides/mcp-clients.md`
+  applies unchanged, and the `ios-project-docs` skill documents the iOS-specific flow. (Xcode
+  itself is not an MCP client.)
 
 **Done when:** a new user can go from "connect server" to "search my project's exact
-SwiftUI/SPM version" by following documented skills/recipes. **Met** for the CLI/skill
-flow; a dedicated Xcode client-setup example remains.
+SwiftUI/SPM version" by following documented skills/recipes. **Met.**
 
 ---
 
@@ -684,16 +687,21 @@ flow; a dedicated Xcode client-setup example remains.
 **Goal:** ship the iOS track so Apple teams can adopt it in minutes.
 
 **Tasks**
-- ⬜ Docker image builds the **Swift** (and, if adopted, Obj-C + C) tree-sitter grammars on
-  Node 22 (`node:22-trixie-slim`); `docker-e2e` asserts the Swift grammar loads and parses
-  inside the production image — this also serves as the **Node 22 re-validation** for the
-  iOS grammars.
-- ⬜ Optional **pre-seeded index** for stable Apple core docs (Swift stdlib, SwiftUI) so
-  first-run search is useful without a long scrape.
-- ⬜ Release automation + changelog records the iOS deltas alongside the Android ones.
+- ❄️ Docker **Swift grammar** — deferred with the i1 AST parser: `tree-sitter-swift@0.6.0`
+  fails to build from source (no prebuild) and `0.7.x` needs core `^0.22`. The image's build
+  deps already cover the Kotlin/Java grammars; a Swift grammar is added here once a
+  `^0.21`-compatible prebuilt release exists. **No native dependency is required for the iOS
+  feature set** — DocC scraping and iOS manifest parsing are pure TypeScript, so they already
+  ship in the image via `npm run build` with no extra Docker work.
+- ⬜ Optional **pre-seeded index** for stable Apple core docs (Swift stdlib, SwiftUI) —
+  deferred (nice-to-have; not blocking adoption).
+- ✅ Release automation — semantic-release publishes iOS changes on the same pipeline as
+  Android (these `feat`/`fix` commits flow through it) and the CHANGELOG records them
+  automatically. No iOS-specific release wiring needed.
 
-**Done when:** `docker run …` yields a working server that parses Swift and scrapes DocC,
-validated by the Docker E2E suite.
+**Done when:** `docker run …` yields a working server that scrapes DocC and resolves iOS
+project versions (both pure-TS, shipping today). **Met** for the DocC/manifest feature set;
+Swift **AST** parsing in the image is deferred with the grammar.
 
 ---
 
