@@ -47,5 +47,19 @@ export function projectVersionForLibrary(
     }
   }
 
+  // 3. SPM/Carthage repo-name match (search `swift-argument-parser` ~
+  //    `apple/swift-argument-parser`).
+  for (const dep of dependencies) {
+    if (
+      (dep.ecosystem === "spm" || dep.ecosystem === "carthage") &&
+      dep.coordinate.split("/")[1] === lib
+    ) {
+      const version = pinnedVersion(dep.version);
+      if (version) {
+        return version;
+      }
+    }
+  }
+
   return null;
 }

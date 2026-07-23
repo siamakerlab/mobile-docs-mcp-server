@@ -6,6 +6,8 @@
  * - `maven` → javadoc.io (`/doc/{group}/{artifact}[/{version}]`)
  * - `pub` → pub.dev (`/packages/{name}[/versions/{version}]`)
  * - `gradle-plugin` → plugins.gradle.org (`/plugin/{id}[/{version}]`)
+ * - `spm` / `carthage` → Swift Package Index (`/{owner}/{repo}[/{version}]/documentation`)
+ * - `cocoapods` → no hosted docs (CocoaDocs sunset) → `null`
  *
  * A concrete pinned version (e.g. `4.12.0`, `1.9.22`, `1.0.0-alpha`) is included in
  * the path. Constraint or dynamic versions (`^1.1.0`, `>=1.0.0`, `1.0.+`, `any`, an
@@ -69,5 +71,24 @@ export function documentationUrl(dep: ResolvedDependency): string | null {
       const base = `https://plugins.gradle.org/plugin/${encodeURIComponent(dep.coordinate)}`;
       return version ? `${base}/${encodeURIComponent(version)}` : base;
     }
+    case "spm":
+    case "carthage": {
+      // coordinate = owner/repo → Swift Package Index (Swift's javadoc.io/pub.dev
+      // equivalent, hosting versioned DocC). The specific target module isn't known
+      // from the lock file, so point at the package's `/documentation` entry (SPI
+      // resolves the default target); pin the version when it is concrete.
+      const [owner, repo] = dep.coordinate.split("/");
+      if (!owner || !repo) {
+        return null;
+      }
+      const base = `https://swiftpackageindex.com/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`;
+      return version
+        ? `${base}/${encodeURIComponent(version)}/documentation`
+        : `${base}/documentation`;
+    }
+    case "cocoapods":
+      // CocoaPods docs are not hosted (CocoaDocs was sunset). Versions remain useful
+      // for resolution, but there is no registry doc URL to scrape.
+      return null;
   }
 }

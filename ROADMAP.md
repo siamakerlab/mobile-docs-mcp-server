@@ -409,7 +409,7 @@ version-awareness.
 | i1 | Source-code intelligence (Swift / Obj-C) | `src/splitter/treesitter/parsers/` | ⬜ planned |
 | i2 | Apple ecosystem registries | `src/scraper/strategies/` | 🟡 apple + SPI + swift.org landed |
 | i3 | DocC render-JSON pipeline | `src/scraper/` (new JSON-native pipeline) | 🟡 pipeline + renderer landed |
-| i4 | iOS project-aware version resolution | `src/manifest/`, `src/tools/` | ⬜ planned |
+| i4 | iOS project-aware version resolution | `src/manifest/`, `src/tools/` | 🟡 lock-file resolution landed |
 | i5 | Search quality tuning for iOS | `tests/search-eval/` | ⬜ planned |
 | i6 | iOS agent skills & DX | `skills/`, docs | ⬜ planned |
 | i7 | Distribution (Swift grammar in Docker) | Docker, release pipeline | ⬜ planned |
@@ -574,32 +574,44 @@ tagged with new ecosystems (`spm` / `cocoapods` / `carthage`).
 (Ruby) are executable code carrying only loose ranges; exact pins live in the lock files.
 
 **Tasks**
-- ⬜ **`Package.resolved` parser** (JSON, exact versions) — handle all three schema
-  versions: **v1** (`object.pins[]` with `package` / `repositoryURL` / `state.version`),
-  **v2** (`pins[]` with `identity` / `location` / `state.version`), **v3** (v2 +
-  `originHash`). Branch on the top-level `version` field. Also read the Xcode-embedded copy
-  at `*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved`.
-- ⬜ **`Podfile.lock` parser** (YAML, exact versions) — the `PODS:` section, parenthesized
-  versions (`- Alamofire (5.9.1)`), with `DEPENDENCIES` for declared constraints.
-- ⬜ **`Cartfile.resolved` parser** — trivial line format `github "owner/repo" "5.9.1"`.
+- ✅ **`Package.resolved` parser** (`packageResolved.ts`, JSON, exact versions) — handles all
+  three schema versions: **v1** (`object.pins[]` with `package` / `repositoryURL` /
+  `state.version`), **v2** (`pins[]` with `identity` / `location` / `state.version`), **v3**
+  (v2 + `originHash`). Reduces git URLs to `owner/repo` (`gitCoordinate.ts`); branch/revision
+  pins reported with a `null` version + note. The recursive walk also reaches the
+  Xcode-embedded copy at `*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved`.
+- ✅ **`Podfile.lock` parser** (`podfileLock.ts`, YAML, exact versions) — the `PODS:` section,
+  parenthesized versions (`- Alamofire (5.9.1)`), subspecs collapsed to their top-level pod.
+- ✅ **`Cartfile.resolved` parser** (`cartfileResolved.ts`) — line format
+  `github "owner/repo" "5.9.1"` / `git "url" "5.9.1"`.
 - ⬜ **Best-effort loose parsers** for `Package.swift` (prefer `swift package dump-package`
   JSON when a Swift toolchain is present; else regex the common `.package(url:from:)` forms
   and **flag as unresolved**), `Podfile`, `Cartfile`, and `.pbxproj`
   `XCRemoteSwiftPackageReference` (the `requirement` dict — ranges only, exact only when
   `kind == exactVersion`). Report dynamic/branch/range entries as unresolved rather than
   guessing — same policy as Gradle dynamic versions.
-- ⬜ **`documentationUrl` mapping** — SPM coordinate (git URL / identity) → Swift Package
-  Index `{owner}/{repo}/{version}/documentation/{target}`; CocoaPods pod → SPI or the
-  podspec's `documentation_url`.
-- ⬜ Extend `src/manifest/discovery.ts` to walk `.xcodeproj`/`.xcworkspace` and locate the
-  embedded `Package.resolved`.
+- ✅ **`documentationUrl` mapping** — SPM/Carthage coordinate (`owner/repo`) → Swift Package
+  Index `{owner}/{repo}[/{version}]/documentation`; CocoaPods → `null` (CocoaDocs sunset, no
+  hosted docs). Target module isn't known from the lock file, so the default target is used
+  (see §22 open question). `projectVersionForLibrary` also matches an SPM/Carthage repo name
+  so `search --project` defaults iOS searches to the pinned version.
+- ✅ **`discovery.ts`** registers `Package.resolved` / `Podfile.lock` / `Cartfile.resolved`;
+  the existing recursive walk reaches `.xcodeproj`/`.xcworkspace` embedded copies without a
+  special case. `ResolveProjectDepsTool` and `ScrapeProjectTool` inherit iOS support with no
+  changes (they delegate to `resolveProjectManifests` + `documentationUrl`).
 
-**Risks:** `Package.swift`/`Podfile` DSLs resist static parse; three incompatible
-`Package.resolved` schemas; `.pbxproj` is an old-style plist (convert via `plutil` or a
-library, never hand-parse); a package may vend multiple DocC targets (which module to map?).
+**Risks:** `Package.swift`/`Podfile` DSLs resist static parse (deferred to loose parsers);
+`.pbxproj` is an old-style plist (convert via `plutil` or a library, never hand-parse); a
+package may vend multiple DocC targets (which module to map? — §22).
 
 **Done when:** pointing the tool at a real SPM/CocoaPods/Xcode project yields a correct
 version map and version-scoped search results.
+
+**Status (2026-07-23) — i4 lock-file resolution landed.** The three lock parsers +
+`gitCoordinate` + SPI doc-URL mapping + `search --project` matching ship end-to-end; CLI/MCP
+`resolve-project-deps` and `scrape-project` cover SPM/CocoaPods/Carthage (and Xcode-embedded
+`Package.resolved`) with no tool-layer changes. Remaining: best-effort loose parsers for the
+DSL manifests + `.pbxproj`.
 
 ---
 

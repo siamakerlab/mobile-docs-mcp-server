@@ -99,4 +99,46 @@ describe("documentationUrl", () => {
       ),
     ).toBe("https://javadoc.io/static/a%2F..%2Fb/artifact/1.0.0/index.html");
   });
+
+  it("maps a pinned SPM coordinate to a versioned Swift Package Index URL", () => {
+    expect(
+      documentationUrl(
+        dep({
+          ecosystem: "spm",
+          coordinate: "pointfreeco/swift-composable-architecture",
+          version: "1.15.0",
+        }),
+      ),
+    ).toBe(
+      "https://swiftpackageindex.com/pointfreeco/swift-composable-architecture/1.15.0/documentation",
+    );
+  });
+
+  it("maps an unpinned SPM coordinate to the package documentation entry", () => {
+    expect(
+      documentationUrl(
+        dep({ ecosystem: "spm", coordinate: "apple/swift-argument-parser" }),
+      ),
+    ).toBe("https://swiftpackageindex.com/apple/swift-argument-parser/documentation");
+  });
+
+  it("maps a Carthage coordinate to Swift Package Index like SPM", () => {
+    expect(
+      documentationUrl(
+        dep({
+          ecosystem: "carthage",
+          coordinate: "Alamofire/Alamofire",
+          version: "5.9.1",
+        }),
+      ),
+    ).toBe("https://swiftpackageindex.com/Alamofire/Alamofire/5.9.1/documentation");
+  });
+
+  it("returns null for CocoaPods (docs are not hosted)", () => {
+    expect(
+      documentationUrl(
+        dep({ ecosystem: "cocoapods", coordinate: "Alamofire", version: "5.9.1" }),
+      ),
+    ).toBeNull();
+  });
 });

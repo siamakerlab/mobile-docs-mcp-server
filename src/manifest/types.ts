@@ -7,7 +7,13 @@
  */
 
 /** The dependency ecosystem a coordinate belongs to. */
-export type Ecosystem = "maven" | "pub" | "gradle-plugin";
+export type Ecosystem =
+  | "maven"
+  | "pub"
+  | "gradle-plugin"
+  | "spm"
+  | "cocoapods"
+  | "carthage";
 
 /**
  * A single dependency declared in a project manifest.
@@ -18,6 +24,8 @@ export interface ResolvedDependency {
    * - `maven` → `group:artifact` (e.g. `androidx.core:core-ktx`)
    * - `pub` → package name (e.g. `provider`)
    * - `gradle-plugin` → plugin id (e.g. `com.android.application`)
+   * - `spm` / `carthage` → `owner/repo` (e.g. `pointfreeco/swift-composable-architecture`)
+   * - `cocoapods` → pod name (e.g. `Alamofire`)
    */
   coordinate: string;
   /**

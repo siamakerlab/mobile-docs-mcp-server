@@ -40,4 +40,22 @@ describe("projectVersionForLibrary", () => {
       projectVersionForLibrary([dep({ coordinate: "g:a", version: "1.0.0" })], "b"),
     ).toBeNull();
   });
+
+  it("matches an SPM repo name (search term ~ owner/repo)", () => {
+    const deps = [
+      dep({
+        coordinate: "apple/swift-argument-parser",
+        version: "1.3.0",
+        ecosystem: "spm",
+      }),
+    ];
+    expect(projectVersionForLibrary(deps, "swift-argument-parser")).toBe("1.3.0");
+  });
+
+  it("matches a Carthage repo name", () => {
+    const deps = [
+      dep({ coordinate: "Alamofire/Alamofire", version: "5.9.1", ecosystem: "carthage" }),
+    ];
+    expect(projectVersionForLibrary(deps, "Alamofire")).toBe("5.9.1");
+  });
 });
