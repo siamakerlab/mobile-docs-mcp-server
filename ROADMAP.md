@@ -406,7 +406,7 @@ version-awareness.
 
 | Phase | Theme | Primary code surface | Status |
 |------|-------|----------------------|--------|
-| i1 | Source-code intelligence (Swift / Obj-C) | `src/splitter/treesitter/parsers/` | ⬜ planned |
+| i1 | Source-code intelligence (Swift / Obj-C) | `src/splitter/treesitter/parsers/` | 🟡 line-based (AST deferred: grammar build) |
 | i2 | Apple ecosystem registries | `src/scraper/strategies/` | 🟡 apple + SPI + swift.org landed |
 | i3 | DocC render-JSON pipeline | `src/scraper/` (new JSON-native pipeline) | 🟡 pipeline + renderer landed |
 | i4 | iOS project-aware version resolution | `src/manifest/`, `src/tools/` | 🟡 lock-file resolution landed |
@@ -455,26 +455,40 @@ Android used for Kotlin:
   (`tree-sitter-c ^0.23.4`); both must build on Node 22 and survive `npm rebuild`.
 
 **Tasks**
-- ⬜ **SwiftParser** — classes, structs, enums, protocols, extensions, functions/methods,
-  initializers, computed/stored properties, `///` + `/** */` doc comments, `// MARK:`
-  boundaries. Fixtures + unit + a `vector-search-e2e` case that indexes a Swift file and
-  retrieves a symbol.
-- ⬜ **ObjCParser or defer** — `@interface`/`@implementation`/`@protocol`, methods,
-  properties. If `tree-sitter-objc@3.0.0` won't load on core 0.21, ship a **line-based
-  fallback** (content-preserving, `logger.debug`-logged, regression-tested) exactly like
-  Dart — don't block the track on it. Obj-C is lower priority than Swift.
-- ⬜ Extend `languageTypes.ts` / extension + MIME maps (`.swift` → `text/x-swift`;
-  `.h`/`.m`/`.mm` routing, with a heuristic for the ambiguous `.h`); add both to
-  `docs/concepts/supported-formats.md`.
-- ⬜ Spike doc `docs/spikes/ios-treesitter-grammars.md` recording the Node 22 load test,
-  mirroring `docs/spikes/phase1-treesitter-grammars.md`.
+- ✅ **Swift line-based indexing** — `.swift` already maps to `text/x-swift` → `swift` in
+  `mimeTypeUtils.ts`, so it routes to the `SourceCodePipeline` and, with no AST grammar
+  registered, indexes via `TreesitterSourceCodeSplitter`'s line-based fallback
+  (content-preserving) exactly like Dart. Regression-tested in
+  `TreesitterSourceCodeSplitter.test.ts`.
+- ❄️ **SwiftParser (AST)** — **deferred: grammar won't build.** `tree-sitter-swift@0.6.0`
+  (the only release peered at core `^0.21`) ships **no N-API prebuild**, so it compiles from
+  source and its `binding.gyp` fails at the `wait_for_tree_sitter` / `tree-sitter-cli`
+  generation step on Node 22. `0.7.x` has prebuilds but needs core `^0.22.1` (incompatible
+  with our pin). So Swift stays on the line-based fallback — same posture as Dart — until
+  either a `^0.21`-compatible prebuilt Swift grammar lands or the core is upgraded to `^0.22`
+  (shared gate with the Kotlin grammars-org migration).
+- ❄️ **ObjCParser** — deferred with Swift. `tree-sitter-objc@3.0.0` (+ transitive
+  `tree-sitter-c`) has the same source-build risk; `.m` also collides with MATLAB on
+  extension. Obj-C indexes via the generic source/line-based path when a MIME is assigned;
+  a dedicated parser waits on the same core upgrade. Lower priority than Swift.
+- ✅ Extension + MIME maps — `.swift` → `text/x-swift` and `docs/concepts/supported-formats.md`
+  already list Swift (upstream's 90+ language coverage). `.h`/`.m`/`.mm` Obj-C-specific MIME
+  routing deferred with ObjCParser.
+- ⬜ Spike doc `docs/spikes/ios-treesitter-grammars.md` recording the Node 22 build failure
+  (optional; the failure + decision are captured here).
 
 **Risks:** the same core-version conflict that shaped Android Phase 1; ambiguous `.h`
 headers (C / C++ / Obj-C); Obj-C's transitive `tree-sitter-c` grammar; grammar staleness
 vs. newest Swift syntax.
 
-**Done when:** indexing a Swift file yields symbol- and doc-aligned chunks, verified by
-tests, with a measurable retrieval improvement over the line-based baseline.
+**Done when:** indexing a Swift file yields symbol- and doc-aligned chunks. **Interim (met):**
+Swift files index via the line-based fallback (verified by tests); AST-aware boundaries are
+deferred to a compatible/prebuilt Swift grammar or a core `^0.22` upgrade.
+
+**Status (2026-07-23).** Swift source is indexable today (line-based, like Dart). The AST
+parser is blocked by grammar tooling, not by this codebase: `tree-sitter-swift@0.6.0` fails
+to build from source on Node 22 and the prebuilt `0.7.x` needs a newer core. Tracked as a
+deferred follow-up, not a Phase i1 blocker.
 
 ---
 

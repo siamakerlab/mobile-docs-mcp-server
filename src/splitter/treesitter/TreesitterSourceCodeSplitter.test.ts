@@ -147,6 +147,21 @@ end
       expect(reconstructed).toContain("greet()");
     });
 
+    it("should still index Swift via line-based fallback (no AST grammar yet)", async () => {
+      const swiftCode = `struct Greeter: View {
+  let name: String
+  /// Greets the user.
+  func greet() -> String { "Hello, \\(name)" }
+}
+`;
+      const chunks = await splitter.splitText(swiftCode, "text/x-swift");
+      expect(chunks.length).toBeGreaterThan(0);
+      expect(chunks[0].types).toContain("code");
+      const reconstructed = chunks.map((c) => c.content).join("");
+      expect(reconstructed).toContain("struct Greeter");
+      expect(reconstructed).toContain("greet()");
+    });
+
     it("should handle parse errors gracefully", async () => {
       const invalidCode = `
         function hello( {
