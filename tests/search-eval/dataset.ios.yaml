@@ -1,0 +1,117 @@
+# iOS-focused search-quality benchmark dataset (this fork).
+#
+# status: draft — entries were authored from common Swift/SwiftUI/iOS community questions
+# and knowledge of Apple's DocC documentation structure. Every entry needs a human pass
+# (and a scrape of the target corpus) before it becomes an official baseline. URLs use
+# canonical developer.apple.com / docs.swift.org human page paths (the scraper fetches
+# their DocC render-JSON twins).
+#
+# Grades:
+#   3 = canonical doc page for the query
+#   2 = closely related / partial answer
+#   1 = peripheral / supporting context
+#
+# Intents:
+#   api-lookup, conceptual, comparison, troubleshooting
+#
+# Run (once the corpora are indexed):
+#   DOCS_EVAL_DATASET=tests/search-eval/dataset.ios.yaml \
+#     npm run evaluate:search:baseline
+
+status: draft
+notes: |
+  Authored 2026-07-23 as the initial iOS-focused dataset for this fork. Covers the Swift
+  language, SwiftUI, UIKit, Foundation, and Swift Package Manager across the four intents.
+  URLs are best-effort canonical Apple / Swift.org paths and MUST be verified against a
+  real scrape before use as a gated baseline.
+
+entries:
+  # --- Swift language (docs.swift.org) ---
+  - vars:
+      library: swift
+      query: what is an optional and how do I unwrap it
+      intent: conceptual
+      qrels:
+        - { url: "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/thebasics", grade: 3 }
+        - { url: "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/optionalchaining", grade: 2 }
+  - vars:
+      library: swift
+      query: struct vs class value versus reference semantics
+      intent: comparison
+      qrels:
+        - { url: "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/classesandstructures", grade: 3 }
+  - vars:
+      library: swift
+      query: async await structured concurrency
+      intent: conceptual
+      qrels:
+        - { url: "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/concurrency", grade: 3 }
+
+  # --- SwiftUI (developer.apple.com) ---
+  - vars:
+      library: swiftui
+      query: manage view state with the State property wrapper
+      intent: api-lookup
+      qrels:
+        - { url: "https://developer.apple.com/documentation/swiftui/state", grade: 3 }
+        - { url: "https://developer.apple.com/documentation/swiftui/managing-user-interface-state", grade: 2 }
+  - vars:
+      library: swiftui
+      query: scrollable list of items
+      intent: api-lookup
+      qrels:
+        - { url: "https://developer.apple.com/documentation/swiftui/list", grade: 3 }
+  - vars:
+      library: swiftui
+      query: navigate between screens with NavigationStack
+      intent: api-lookup
+      qrels:
+        - { url: "https://developer.apple.com/documentation/swiftui/navigationstack", grade: 3 }
+  - vars:
+      library: swiftui
+      query: State vs StateObject vs ObservedObject
+      intent: comparison
+      qrels:
+        - { url: "https://developer.apple.com/documentation/swiftui/stateobject", grade: 3 }
+        - { url: "https://developer.apple.com/documentation/swiftui/observedobject", grade: 2 }
+        - { url: "https://developer.apple.com/documentation/swiftui/state", grade: 2 }
+
+  # --- UIKit (developer.apple.com) ---
+  - vars:
+      library: uikit
+      query: view controller lifecycle viewDidLoad
+      intent: api-lookup
+      qrels:
+        - { url: "https://developer.apple.com/documentation/uikit/uiviewcontroller", grade: 3 }
+
+  # --- Foundation (developer.apple.com) ---
+  - vars:
+      library: foundation
+      query: make an HTTP request with URLSession
+      intent: api-lookup
+      qrels:
+        - { url: "https://developer.apple.com/documentation/foundation/urlsession", grade: 3 }
+        - { url: "https://developer.apple.com/documentation/foundation/urlsession/data(from:delegate:)", grade: 2 }
+  - vars:
+      library: foundation
+      query: decode JSON into a Codable struct
+      intent: api-lookup
+      qrels:
+        - { url: "https://developer.apple.com/documentation/foundation/jsondecoder", grade: 3 }
+        - { url: "https://developer.apple.com/documentation/swift/codable", grade: 2 }
+
+  # --- Swift Package Manager (developer.apple.com) ---
+  - vars:
+      library: spm
+      query: add a package dependency in Package.swift
+      intent: api-lookup
+      qrels:
+        - { url: "https://developer.apple.com/documentation/packagedescription/package/dependency", grade: 3 }
+        - { url: "https://developer.apple.com/documentation/packagedescription", grade: 2 }
+  - vars:
+      library: spm
+      query: package resolution version conflict fix
+      intent: troubleshooting
+      qrels:
+        - { url: "https://developer.apple.com/documentation/packagedescription/package/dependency/requirement-swift.enum", grade: 2 }
+        - { url: "https://developer.apple.com/documentation/packagedescription", grade: 1 }

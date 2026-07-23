@@ -410,7 +410,7 @@ version-awareness.
 | i2 | Apple ecosystem registries | `src/scraper/strategies/` | 🟡 apple + SPI + swift.org landed |
 | i3 | DocC render-JSON pipeline | `src/scraper/` (new JSON-native pipeline) | 🟡 pipeline + renderer landed |
 | i4 | iOS project-aware version resolution | `src/manifest/`, `src/tools/` | 🟡 lock-file resolution landed |
-| i5 | Search quality tuning for iOS | `tests/search-eval/` | ⬜ planned |
+| i5 | Search quality tuning for iOS | `tests/search-eval/` | 🟡 qrel dataset (draft) |
 | i6 | iOS agent skills & DX | `skills/`, docs | 🟡 skill + README (Xcode setup pending) |
 | i7 | Distribution (Swift grammar in Docker) | Docker, release pipeline | ⬜ planned |
 
@@ -636,9 +636,11 @@ version map and version-scoped search results.
 Same surface as Android Phase 5 — `tests/search-eval/` and `DocumentRetrieverService.ts`.
 
 **Tasks**
-- ⬜ **iOS qrel dataset** `tests/search-eval/dataset.ios.yaml` — labelled queries across
-  Swift, SwiftUI, UIKit, Foundation, and SPM over all four intents (api-lookup /
-  conceptual / comparison / troubleshooting), same schema as the Android/upstream datasets.
+- 🟡 **iOS qrel dataset** `tests/search-eval/dataset.ios.yaml` — **draft** shipped: 12
+  labelled queries across Swift, SwiftUI, UIKit, Foundation, and SPM over all four intents
+  (api-lookup / conceptual / comparison / troubleshooting), same schema as the
+  Android/upstream datasets. URLs are best-effort canonical Apple/Swift.org paths and need
+  a human pass + a real scrape of the corpora before they can gate regressions.
 - ⬜ Tune RRF weights / FTS generation for Swift symbol-heavy queries (`@State`,
   `some View`, `NavigationStack`, `URLSession.data(from:)`). Blocked on the Apple corpora
   being indexed and the qrel dataset finalized.
