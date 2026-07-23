@@ -598,12 +598,13 @@ tagged with new ecosystems (`spm` / `cocoapods` / `carthage`).
   parenthesized versions (`- Alamofire (5.9.1)`), subspecs collapsed to their top-level pod.
 - ✅ **`Cartfile.resolved` parser** (`cartfileResolved.ts`) — line format
   `github "owner/repo" "5.9.1"` / `git "url" "5.9.1"`.
-- ⬜ **Best-effort loose parsers** for `Package.swift` (prefer `swift package dump-package`
-  JSON when a Swift toolchain is present; else regex the common `.package(url:from:)` forms
-  and **flag as unresolved**), `Podfile`, `Cartfile`, and `.pbxproj`
-  `XCRemoteSwiftPackageReference` (the `requirement` dict — ranges only, exact only when
-  `kind == exactVersion`). Report dynamic/branch/range entries as unresolved rather than
-  guessing — same policy as Gradle dynamic versions.
+- 🟡 **Best-effort loose parsers** — `Package.swift` (`packageSwift.ts`), `Podfile`
+  (`podfile.ts`), and `Cartfile` (`cartfile.ts`) ship: regex the common declaration forms,
+  extract only exact pins (`exact:` / bare version), and **flag range/branch/operator forms
+  as unresolved** — same policy as Gradle dynamic versions. `discovery.ts` prefers the lock
+  file when present (`Package.resolved` / `Podfile.lock` / `Cartfile.resolved` shadow the
+  loose manifest in the same directory). ⬜ `.pbxproj` `XCRemoteSwiftPackageReference`
+  (old-style plist — needs `plutil` or a library) remains deferred.
 - ✅ **`documentationUrl` mapping** — SPM/Carthage coordinate (`owner/repo`) → Swift Package
   Index `{owner}/{repo}[/{version}]/documentation`; CocoaPods → `null` (CocoaDocs sunset, no
   hosted docs). Target module isn't known from the lock file, so the default target is used
@@ -624,8 +625,8 @@ version map and version-scoped search results.
 **Status (2026-07-23) — i4 lock-file resolution landed.** The three lock parsers +
 `gitCoordinate` + SPI doc-URL mapping + `search --project` matching ship end-to-end; CLI/MCP
 `resolve-project-deps` and `scrape-project` cover SPM/CocoaPods/Carthage (and Xcode-embedded
-`Package.resolved`) with no tool-layer changes. Remaining: best-effort loose parsers for the
-DSL manifests + `.pbxproj`.
+`Package.resolved`) with no tool-layer changes. Loose DSL-manifest fallbacks
+(`Package.swift` / `Podfile` / `Cartfile`) also ship. Remaining: `.pbxproj` (old-style plist).
 
 ---
 
