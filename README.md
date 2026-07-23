@@ -17,21 +17,22 @@ This fork adapts Grounded Docs into a documentation companion purpose-built for 
 -   **Flutter / Dart** — framework documentation and pub.dev package references.
 -   **Gradle** — the build system, Android Gradle Plugin, and plugin DSL.
 
-**iOS / Apple — on the roadmap:**
+**iOS / Apple — DocC indexing + version resolution landed:**
 
--   **Swift / Objective-C** — language and framework source (SwiftUI, UIKit, Foundation).
--   **DocC** — Apple's documentation format, served as directly fetchable render JSON by developer.apple.com, docs.swift.org, and Swift Package Index.
--   **Swift Package Manager / CocoaPods / Carthage** — dependency coordinates and exact-version resolution.
+-   **DocC** — Apple's documentation format, indexed directly from its render JSON (developer.apple.com, docs.swift.org, Swift Package Index) with no headless browser.
+-   **Swift Package Manager / CocoaPods / Carthage** — dependency coordinates and exact-version resolution from lock files.
+-   **Swift / Objective-C source** — indexed line-based today (content-preserving); AST-aware chunking is tracked (a `^0.21`-compatible Swift grammar is pending).
 
-**Ultimate goal:** keep the powerful indexing and hybrid semantic-search core intact while tuning ingestion, formatting, and defaults toward the mobile documentation an AI coding assistant needs to stay accurate and version-aware. The **Android track has largely landed**; the **iOS track is planned** (Phases i1–i7). Everything here layers additively on top of upstream — full credit for the original design and implementation belongs to the [original authors](https://github.com/arabold/docs-mcp-server).
+**Ultimate goal:** keep the powerful indexing and hybrid semantic-search core intact while tuning ingestion, formatting, and defaults toward the mobile documentation an AI coding assistant needs to stay accurate and version-aware. The **Android track** and the **iOS track's core** (DocC indexing + version resolution) have largely landed; search-quality tuning, packaging, and Swift AST remain. Everything here layers additively on top of upstream — full credit for the original design and implementation belongs to the [original authors](https://github.com/arabold/docs-mcp-server).
 
 See the **[ROADMAP](ROADMAP.md)** for the detailed, phased plan across both tracks.
 
 ### Mobile project workflow (fork-specific)
 
 These commands use features this fork adds on top of upstream (the
-`resolve-project-deps` / `scrape-project` commands and Kotlin/Java AST chunking). Today
-they cover Android/Flutter projects; iOS/SPM support is on the roadmap. Published to npm
+`resolve-project-deps` / `scrape-project` commands, Kotlin/Java AST chunking, and the DocC
+render-JSON pipeline). They cover **Android/Flutter** projects (Gradle, `pubspec`) and
+**iOS/Swift** projects (Swift Package Manager, CocoaPods, Carthage). Published to npm
 (requires **Node.js 22+**):
 
 ```bash
@@ -75,9 +76,16 @@ docs-mcp-server search okhttp "connection pool timeout"
 
 Over MCP, the `resolve_project_deps` tool returns each dependency's `docUrl`, so an
 assistant can resolve → scrape → search version-correct documentation in one flow.
-Recognized manifests today: Gradle version catalogs (`libs.versions.toml`),
-`build.gradle(.kts)` / `settings.gradle(.kts)`, and Flutter `pubspec.yaml` / `pubspec.lock`.
-Planned for iOS: `Package.resolved`, `Podfile.lock`, `Cartfile.resolved`.
+Recognized manifests:
+- **Android/Flutter** — Gradle version catalogs (`libs.versions.toml`),
+  `build.gradle(.kts)` / `settings.gradle(.kts)`, Flutter `pubspec.yaml` / `pubspec.lock`.
+- **iOS** — `Package.resolved` (SwiftPM, incl. Xcode-embedded), `Podfile.lock` (CocoaPods),
+  `Cartfile.resolved` (Carthage); loose `Package.swift` / `Podfile` / `Cartfile` fallbacks.
+
+For an iOS/Swift example and Apple DocC scrape recipes, see the
+[`ios-project-docs`](skills/ios-project-docs/) skill; Apple docs
+(`developer.apple.com`, `docs.swift.org`) and Swift Package Index are indexed directly
+from their DocC render JSON with no headless browser.
 
 ## ✨ Why Grounded Docs MCP Server?
 

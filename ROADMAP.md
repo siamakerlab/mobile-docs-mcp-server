@@ -411,7 +411,7 @@ version-awareness.
 | i3 | DocC render-JSON pipeline | `src/scraper/` (new JSON-native pipeline) | 🟡 pipeline + renderer landed |
 | i4 | iOS project-aware version resolution | `src/manifest/`, `src/tools/` | 🟡 lock-file resolution landed |
 | i5 | Search quality tuning for iOS | `tests/search-eval/` | ⬜ planned |
-| i6 | iOS agent skills & DX | `skills/`, docs | ⬜ planned |
+| i6 | iOS agent skills & DX | `skills/`, docs | 🟡 skill + README (Xcode setup pending) |
 | i7 | Distribution (Swift grammar in Docker) | Docker, release pipeline | ⬜ planned |
 
 **Critical path — different from Android.** Apple's docs (and every DocC-based site)
@@ -655,16 +655,21 @@ baseline, with regressions gating.
 **Goal:** make the iOS workflow turnkey, mirroring `skills/android-project-docs/`.
 
 **Tasks**
-- ⬜ **`skills/ios-project-docs/SKILL.md`** — the resolve → scrape-project →
-  search-with-`--project` flow plus Swift source indexing, in the SKILL.md format.
-- ⬜ Ready-made **scrape recipes** for the canonical Apple sources
+- ✅ **`skills/ios-project-docs/SKILL.md`** — the resolve → scrape-project →
+  search-with-`--project` flow plus Swift source indexing, in the SKILL.md format,
+  mirroring `android-project-docs`.
+- ✅ Ready-made **scrape recipes** for the canonical Apple sources
   (`developer.apple.com/documentation`, `docs.swift.org/swift-book`,
-  `swiftpackageindex.com`).
-- ⬜ MCP client setup examples for iOS tooling (Xcode + MCP-capable assistants).
-- ⬜ README "iOS workflow" section paralleling the existing Android one.
+  `swiftpackageindex.com`) — included in the skill.
+- ✅ README updated — the "Mobile project workflow" section covers iOS projects, the
+  recognized-manifests list includes the iOS lock/loose files, and the "About This Fork"
+  section reflects the landed iOS state; it links to the `ios-project-docs` skill.
+- ⬜ MCP client setup examples aimed specifically at Xcode + MCP-capable assistants
+  (general client setup already lives in `docs/guides/mcp-clients.md`).
 
 **Done when:** a new user can go from "connect server" to "search my project's exact
-SwiftUI/SPM version" by following documented skills/recipes.
+SwiftUI/SPM version" by following documented skills/recipes. **Met** for the CLI/skill
+flow; a dedicated Xcode client-setup example remains.
 
 ---
 
